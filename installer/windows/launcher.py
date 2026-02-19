@@ -16,9 +16,17 @@ import os
 import sys
 from pathlib import Path
 
+_LOG_DIR = Path.home() / ".telemetry-tracker"
+_LOG_DIR.mkdir(parents=True, exist_ok=True)
+_LOG_FILE = _LOG_DIR / "tracker.log"
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    handlers=[
+        logging.FileHandler(str(_LOG_FILE), encoding="utf-8"),
+        logging.StreamHandler(),
+    ],
 )
 logger = logging.getLogger("tracker.launcher")
 
@@ -86,4 +94,8 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception:
+        logger.exception("Fatal error in launcher")
+        sys.exit(1)
