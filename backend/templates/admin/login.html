@@ -1,0 +1,29 @@
+{% extends "admin/base.html" %}
+{% block title %}Sign In — Zinnia Axion Admin{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: center; align-items: center; min-height: 70vh;">
+    <div class="card" style="max-width: 420px; width: 100%; text-align: center; padding: 40px;">
+        <h1 style="font-size: 1.4rem; font-weight: 700; margin-bottom: 8px; color: #0f172a;">
+            Zinnia Axion
+        </h1>
+        <p style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; color: #94a3b8; margin-bottom: 32px;">
+            Admin Portal
+        </p>
+
+        {% if error %}
+        <div class="alert alert-warning" style="text-align: left; margin-bottom: 24px;">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <a href="{{ url_for('admin.admin_login') }}" class="btn btn-primary" style="width: 100%; text-align: center; display: block;">
+            Sign in with SSO
+        </a>
+
+        <p style="font-size: 0.78rem; color: #94a3b8; margin-top: 24px;">
+            Authentication is managed by your organization's identity provider.
+        </p>
+    </div>
+</div>
+{% endblock %}

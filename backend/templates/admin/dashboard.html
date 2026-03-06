@@ -1,0 +1,130 @@
+{% extends "admin/base.html" %}
+{% block title %}Dashboard — Zinnia Axion Admin{% endblock %}
+
+{% block content %}
+<div class="header">
+    <div>
+        <div class="header-title">Zinnia Axion</div>
+        <div class="header-subtitle">Admin Dashboard</div>
+    </div>
+    <div class="header-spacer"></div>
+    <div class="header-user">
+        {% if not demo_mode %}
+        Signed in as <strong>{{ display_name }}</strong>
+        &nbsp;|&nbsp;
+        Team: <strong>{{ team.name }}</strong>
+        &nbsp;|&nbsp;
+        <form method="POST" action="{{ url_for('admin.admin_logout') }}" style="display:inline;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-sm btn-danger">Logout</button>
+        </form>
+        {% else %}
+        <span class="badge badge-amber">Demo Mode</span>
+        {% endif %}
+    </div>
+</div>
+
+{% if demo_mode %}
+<div class="alert alert-warning">
+    Running in demo mode — authentication and team isolation are disabled.
+    Set <code>DEMO_MODE=false</code> to enforce security.
+</div>
+{% endif %}
+
+<!-- Metrics -->
+{% if leaderboard %}
+{% set total_users = leaderboard | length %}
+{% set avg_prod = (leaderboard | map(attribute='productive_pct') | sum) / total_users if total_users else 0 %}
+{% set avg_np = (leaderboard | map(attribute='non_productive_pct') | sum) / total_users if total_users else 0 %}
+{% set total_sec = leaderboard | map(attribute='total_sec') | sum %}
+
+<div class="metrics">
+    <div class="card metric-card">
+        <div class="metric-label">Team Members</div>
+        <div class="metric-value">{{ team.member_count or total_users }}</div>
+    </div>
+    <div class="card metric-card">
+        <div class="metric-label">Avg Productive</div>
+        <div class="metric-value green">{{ "%.1f" | format(avg_prod) }}%</div>
+    </div>
+    <div class="card metric-card">
+        <div class="metric-label">Avg Non-Productive</div>
+        <div class="metric-value red">{{ "%.1f" | format(avg_np) }}%</div>
+    </div>
+    <div class="card metric-card">
+        <div class="metric-label">Total Tracked</div>
+        <div class="metric-value">
+            {% set hours = (total_sec // 3600) | int %}
+            {% set mins = ((total_sec % 3600) // 60) | int %}
+            {{ hours }}h {{ mins }}m
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Leaderboard -->
+<div class="section-title">
+    {% if team and team.name %}{{ team.name }} — {% endif %}Team Leaderboard
+</div>
+
+<div class="card" style="padding: 0; overflow: hidden;">
+{% if leaderboard %}
+<table>
+    <thead>
+        <tr>
+            <th>User</th>
+            <th>Non-Productive</th>
+            <th>Productive</th>
+            <th>NP Time</th>
+            <th>P Time</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for row in leaderboard %}
+        <tr>
+            <td style="font-weight: 600;">{{ row.user_id }}</td>
+            <td>
+                {% if row.non_productive_pct >= 50 %}
+                <span class="badge badge-red">{{ "%.1f" | format(row.non_productive_pct) }}%</span>
+                {% elif row.non_productive_pct >= 35 %}
+                <span class="badge badge-amber">{{ "%.1f" | format(row.non_productive_pct) }}%</span>
+                {% else %}
+                <span class="badge badge-green">{{ "%.1f" | format(row.non_productive_pct) }}%</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if row.productive_pct >= 55 %}
+                <span class="badge badge-green">{{ "%.1f" | format(row.productive_pct) }}%</span>
+                {% elif row.productive_pct >= 40 %}
+                <span class="badge badge-amber">{{ "%.1f" | format(row.productive_pct) }}%</span>
+                {% else %}
+                <span class="badge badge-red">{{ "%.1f" | format(row.productive_pct) }}%</span>
+                {% endif %}
+            </td>
+            <td>
+                {% set np_h = (row.non_productive_sec // 3600) | int %}
+                {% set np_m = ((row.non_productive_sec % 3600) // 60) | int %}
+                {{ np_h }}h {{ np_m }}m
+            </td>
+            <td>
+                {% set p_h = (row.productive_sec // 3600) | int %}
+                {% set p_m = ((row.productive_sec % 3600) // 60) | int %}
+                {{ p_h }}h {{ p_m }}m
+            </td>
+            <td>
+                {% set t_h = (row.total_sec // 3600) | int %}
+                {% set t_m = ((row.total_sec % 3600) // 60) | int %}
+                {{ t_h }}h {{ t_m }}m
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div style="padding: 40px; text-align: center; color: #94a3b8;">
+    No activity data found for today.
+</div>
+{% endif %}
+</div>
+{% endblock %}

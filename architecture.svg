@@ -1,330 +1,450 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1600" font-family="'Segoe UI', Arial, sans-serif">
-  <defs>
-    <filter id="shadow" x="-4%" y="-4%" width="108%" height="108%">
-      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-opacity="0.15"/>
-    </filter>
-    <marker id="arrowGreen" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#22c55e"/>
-    </marker>
-    <marker id="arrowBlue" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#3b82f6"/>
-    </marker>
-    <marker id="arrowPurple" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#8b5cf6"/>
-    </marker>
-    <marker id="arrowGray" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
-    </marker>
-    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#1e293b"/>
-      <stop offset="100%" style="stop-color:#334155"/>
-    </linearGradient>
-  </defs>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 900" width="1400" height="900" font-family="Inter, 'Segoe UI', Arial, Helvetica, sans-serif">
+<defs>
+  <style>
+    .h1{font-size:20px;font-weight:700;fill:#F8FAFC;letter-spacing:.3px}
+    .h2{font-size:9.5px;font-weight:500;fill:#64748B;letter-spacing:2.5px}
+    .zt{font-size:10px;font-weight:700;fill:#0F172A}
+    .zn{font-size:8px;font-weight:700;fill:#FFF}
+    .sl{font-size:7.5px;font-weight:700;letter-spacing:.8px}
+    .sb{font-size:9px;font-weight:600;fill:#1E293B}
+    .bt{font-size:8.5px;fill:#334155}
+    .bi{font-size:7.5px;fill:#64748B;font-style:italic;font-weight:500}
+    .tl{font-size:7.5px;fill:#94A3B8;font-style:italic;font-weight:500}
+    .pill{font-size:8px;font-weight:600}
+  </style>
+  <marker id="arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+    <path d="M1,1 L6,3 L1,5" fill="none" stroke="#94A3B8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+  </marker>
+  <filter id="ds"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity=".05"/></filter>
+  <linearGradient id="tg" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="#0F172A"/><stop offset="100%" stop-color="#1E293B"/>
+  </linearGradient>
+  <clipPath id="c1"><rect x="20"   y="82" width="182" height="612" rx="10"/></clipPath>
+  <clipPath id="c2"><rect x="216"  y="82" width="182" height="612" rx="10"/></clipPath>
+  <clipPath id="c3"><rect x="412"  y="82" width="182" height="612" rx="10"/></clipPath>
+  <clipPath id="c4"><rect x="608"  y="82" width="182" height="612" rx="10"/></clipPath>
+  <clipPath id="c5"><rect x="804"  y="82" width="182" height="612" rx="10"/></clipPath>
+  <clipPath id="c6"><rect x="1000" y="82" width="182" height="612" rx="10"/></clipPath>
+  <clipPath id="c7"><rect x="1196" y="82" width="182" height="612" rx="10"/></clipPath>
+</defs>
 
-  <!-- Background -->
-  <rect width="1200" height="1600" fill="#f8fafc" rx="12"/>
+<!-- BG -->
+<rect width="1400" height="900" fill="#F1F5F9"/>
 
-  <!-- Title -->
-  <rect x="0" y="0" width="1200" height="70" fill="url(#headerGrad)" rx="12"/>
-  <rect x="0" y="35" width="1200" height="35" fill="url(#headerGrad)"/>
-  <text x="600" y="42" text-anchor="middle" fill="white" font-size="22" font-weight="bold">Zinnia Axion - System Architecture</text>
-  <text x="600" y="62" text-anchor="middle" fill="#94a3b8" font-size="12">2-State Model: Productive vs Non-Productive | Interaction-Based Classification</text>
+<!-- BANNER -->
+<rect width="1400" height="66" fill="url(#tg)"/>
+<text x="700" y="28" text-anchor="middle" class="h1">Zinnia Axion &#8212; Enterprise Architecture</text>
+<text x="700" y="48" text-anchor="middle" class="h2">SECURITY &amp; COMPLIANCE REVIEW &#x2022; INTERNAL / CONFIDENTIAL &#x2022; MARCH 2026</text>
 
-  <!-- ============================================== -->
-  <!--  LAYER 1: OS / Hardware Signals                -->
-  <!-- ============================================== -->
-  <text x="40" y="110" fill="#64748b" font-size="11" font-weight="bold" letter-spacing="2">LAYER 1 - OS / HARDWARE SIGNALS</text>
-  <rect x="30" y="120" width="1140" height="160" rx="10" fill="#f1f5f9" stroke="#cbd5e1" stroke-width="1"/>
+<!-- FLOW LINE -->
+<line x1="111" y1="365" x2="1287" y2="365" stroke="#CBD5E1" stroke-width=".8" stroke-dasharray="4,3" opacity=".3"/>
 
-  <!-- Keyboard -->
-  <rect x="60" y="140" width="160" height="115" rx="8" fill="white" stroke="#22c55e" stroke-width="2" filter="url(#shadow)"/>
-  <rect x="110" y="150" width="60" height="30" rx="4" fill="#dcfce7"/>
-  <text x="140" y="170" text-anchor="middle" fill="#22c55e" font-size="14" font-weight="bold">KB</text>
-  <text x="140" y="197" text-anchor="middle" fill="#1e293b" font-size="13" font-weight="bold">Keyboard</text>
-  <text x="140" y="213" text-anchor="middle" fill="#64748b" font-size="10">pynput listener</text>
-  <text x="140" y="228" text-anchor="middle" fill="#64748b" font-size="10">keystroke_count only</text>
-  <text x="140" y="243" text-anchor="middle" fill="#ef4444" font-size="9" font-weight="bold">NO content captured</text>
+<!-- ============================================================ -->
+<!-- ZONE 1 : ENDPOINTS                                           -->
+<!-- ============================================================ -->
+<rect x="20" y="82" width="182" height="612" rx="10" fill="#FFF" filter="url(#ds)" stroke="#E2E8F0" stroke-width=".5"/>
+<rect x="20" y="82" width="182" height="4" fill="#3B82F6" clip-path="url(#c1)"/>
+<circle cx="42" cy="102" r="10" fill="#3B82F6"/>
+<text x="42" y="105" text-anchor="middle" class="zn">01</text>
+<text x="57" y="106" class="zt">Endpoints</text>
+<line x1="32" y1="116" x2="190" y2="116" stroke="#E2E8F0" stroke-width=".4"/>
 
-  <!-- Mouse -->
-  <rect x="250" y="140" width="160" height="115" rx="8" fill="white" stroke="#3b82f6" stroke-width="2" filter="url(#shadow)"/>
-  <rect x="300" y="150" width="60" height="30" rx="4" fill="#dbeafe"/>
-  <text x="330" y="170" text-anchor="middle" fill="#3b82f6" font-size="14" font-weight="bold">MS</text>
-  <text x="330" y="197" text-anchor="middle" fill="#1e293b" font-size="13" font-weight="bold">Mouse</text>
-  <text x="330" y="213" text-anchor="middle" fill="#64748b" font-size="10">pynput listener</text>
-  <text x="330" y="228" text-anchor="middle" fill="#64748b" font-size="10">clicks + distance (px)</text>
-  <text x="330" y="243" text-anchor="middle" fill="#64748b" font-size="9">thread-safe Lock</text>
+<g transform="translate(72,142)">
+  <rect x="-18" y="-14" width="36" height="24" rx="2.5" fill="none" stroke="#3B82F6" stroke-width="1"/>
+  <rect x="-4" y="10" width="8" height="3" fill="none" stroke="#3B82F6" stroke-width=".8"/>
+  <rect x="-10" y="13" width="20" height="1.5" rx=".8" fill="#93C5FD"/>
+</g>
+<g transform="translate(138,142)">
+  <rect x="-18" y="-12" width="36" height="22" rx="2.5" fill="none" stroke="#3B82F6" stroke-width="1"/>
+  <rect x="-22" y="10" width="44" height="2.5" rx="1" fill="none" stroke="#3B82F6" stroke-width=".8"/>
+</g>
+<text x="72" y="164" text-anchor="middle" class="bi">macOS</text>
+<text x="138" y="164" text-anchor="middle" class="bi">Windows</text>
+<text x="111" y="180" text-anchor="middle" class="sb">Axion Tracker Agent</text>
 
-  <!-- Active Window -->
-  <rect x="440" y="140" width="190" height="115" rx="8" fill="white" stroke="#8b5cf6" stroke-width="2" filter="url(#shadow)"/>
-  <rect x="505" y="150" width="60" height="30" rx="4" fill="#f3e8ff"/>
-  <text x="535" y="170" text-anchor="middle" fill="#8b5cf6" font-size="14" font-weight="bold">WIN</text>
-  <text x="535" y="197" text-anchor="middle" fill="#1e293b" font-size="13" font-weight="bold">Active Window</text>
-  <text x="535" y="213" text-anchor="middle" fill="#64748b" font-size="10">NSWorkspace: app_name</text>
-  <text x="535" y="228" text-anchor="middle" fill="#64748b" font-size="10">AXUIElement: window_title</text>
-  <text x="535" y="243" text-anchor="middle" fill="#64748b" font-size="9">AppleScript fallback</text>
+<text x="34" y="200" class="sl" fill="#16A34A">&#10003; CAPTURES</text>
+<text x="34" y="214" class="bt">&#8226; Active app name</text>
+<text x="34" y="227" class="bt">&#8226; Mouse / key event counts</text>
+<text x="34" y="240" class="bt">&#8226; Idle time (seconds)</text>
+<text x="34" y="253" class="bt">&#8226; Distraction flags</text>
 
-  <!-- Idle Time -->
-  <rect x="660" y="140" width="160" height="115" rx="8" fill="white" stroke="#f59e0b" stroke-width="2" filter="url(#shadow)"/>
-  <rect x="710" y="150" width="60" height="30" rx="4" fill="#fef9c3"/>
-  <text x="740" y="170" text-anchor="middle" fill="#f59e0b" font-size="14" font-weight="bold">IDLE</text>
-  <text x="740" y="197" text-anchor="middle" fill="#1e293b" font-size="13" font-weight="bold">OS Idle Time</text>
-  <text x="740" y="213" text-anchor="middle" fill="#64748b" font-size="10">Quartz CGEventSource</text>
-  <text x="740" y="228" text-anchor="middle" fill="#64748b" font-size="10">idle_seconds (float)</text>
-  <text x="740" y="243" text-anchor="middle" fill="#64748b" font-size="9">resets on any input</text>
+<text x="34" y="274" class="sl" fill="#DC2626">&#10007; NEVER CAPTURED</text>
+<text x="34" y="288" class="bt">&#8226; Keystroke content</text>
+<text x="34" y="301" class="bt">&#8226; Screenshots</text>
+<text x="34" y="314" class="bt">&#8226; Clipboard / files</text>
+<text x="34" y="327" class="bt">&#8226; URLs / web content</text>
+<text x="34" y="340" class="bt">&#8226; Email / messages</text>
+<text x="34" y="353" class="bt">&#8226; PII / PHI</text>
 
-  <!-- Platform Abstraction -->
-  <rect x="850" y="140" width="300" height="115" rx="8" fill="#1e293b" stroke="#475569" stroke-width="2" filter="url(#shadow)"/>
-  <text x="1000" y="165" text-anchor="middle" fill="#f59e0b" font-size="12" font-weight="bold">Platform Abstraction</text>
-  <text x="1000" y="185" text-anchor="middle" fill="white" font-size="11">base.py: PlatformCollector (ABC)</text>
-  <text x="1000" y="203" text-anchor="middle" fill="white" font-size="11">factory.py: get_collector()</text>
-  <text x="1000" y="221" text-anchor="middle" fill="#22c55e" font-size="11">macos.py: MacOSCollector [active]</text>
-  <text x="1000" y="239" text-anchor="middle" fill="#64748b" font-size="11">windows.py / linux.py (extensible)</text>
+<text x="34" y="376" class="sl" fill="#475569">AGENT HARDENING</text>
+<text x="34" y="390" class="bt">&#8226; Code-signed binary</text>
+<text x="34" y="403" class="bt">&#8226; Auto-update w/ sig verify</text>
+<text x="34" y="416" class="bt">&#8226; Read-only policy config</text>
+<text x="34" y="429" class="bt">&#8226; Fields allowlist enforced</text>
+<text x="34" y="442" class="bt">&#8226; Local buffer (offline)</text>
+<text x="34" y="455" class="bt">&#8226; Silent &#8212; no user UI</text>
 
-  <!-- Arrow: OS to Tracker -->
-  <line x1="400" y1="280" x2="400" y2="335" stroke="#22c55e" stroke-width="2" marker-end="url(#arrowGreen)" stroke-dasharray="6,3"/>
-  <text x="410" y="305" fill="#22c55e" font-size="10">OS signals</text>
+<line x1="32" y1="670" x2="190" y2="670" stroke="#E2E8F0" stroke-width=".4"/>
+<text x="111" y="686" text-anchor="middle" class="tl">Zero content capture by design</text>
 
-  <!-- ============================================== -->
-  <!--  LAYER 2: Zinnia Axion Agent                    -->
-  <!-- ============================================== -->
-  <text x="40" y="310" fill="#64748b" font-size="11" font-weight="bold" letter-spacing="2">LAYER 2 - ZINNIA AXION AGENT (tracker/agent.py)</text>
-  <rect x="30" y="320" width="1140" height="195" rx="10" fill="#ecfdf5" stroke="#86efac" stroke-width="1.5"/>
+<!-- ARROW -->
+<line x1="204" y1="365" x2="213" y2="365" stroke="#94A3B8" stroke-width="1.2" marker-end="url(#arr)"/>
 
-  <!-- Polling Loop -->
-  <rect x="60" y="340" width="250" height="155" rx="8" fill="white" stroke="#22c55e" stroke-width="2" filter="url(#shadow)"/>
-  <text x="185" y="365" text-anchor="middle" fill="#22c55e" font-size="14" font-weight="bold">Polling Loop</text>
-  <text x="185" y="385" text-anchor="middle" fill="#1e293b" font-size="11">Every 1s (POLL_INTERVAL):</text>
-  <text x="80" y="405" fill="#64748b" font-size="10">1. get_active_window()</text>
-  <text x="80" y="420" fill="#64748b" font-size="10">2. get_and_reset_counts()</text>
-  <text x="80" y="435" fill="#64748b" font-size="10">3. get_idle_seconds()</text>
-  <text x="80" y="450" fill="#64748b" font-size="10">4. Build sample dict</text>
-  <text x="80" y="465" fill="#64748b" font-size="10">5. Append to in-memory batch</text>
-  <text x="80" y="480" fill="#22c55e" font-size="10" font-weight="bold">Uses time.monotonic()</text>
+<!-- ============================================================ -->
+<!-- ZONE 2 : NETWORK & TRANSPORT                                 -->
+<!-- ============================================================ -->
+<rect x="216" y="82" width="182" height="612" rx="10" fill="#FFF" filter="url(#ds)" stroke="#E2E8F0" stroke-width=".5"/>
+<rect x="216" y="82" width="182" height="4" fill="#0EA5E9" clip-path="url(#c2)"/>
+<circle cx="238" cy="102" r="10" fill="#0EA5E9"/>
+<text x="238" y="105" text-anchor="middle" class="zn">02</text>
+<text x="253" y="106" class="zt">Network &amp; Transport</text>
+<line x1="228" y1="116" x2="386" y2="116" stroke="#E2E8F0" stroke-width=".4"/>
 
-  <!-- Batch + Send -->
-  <rect x="340" y="340" width="250" height="155" rx="8" fill="white" stroke="#3b82f6" stroke-width="2" filter="url(#shadow)"/>
-  <text x="465" y="365" text-anchor="middle" fill="#3b82f6" font-size="14" font-weight="bold">Batch and Send</text>
-  <text x="465" y="385" text-anchor="middle" fill="#1e293b" font-size="11">Every 10s (BATCH_INTERVAL):</text>
-  <text x="355" y="405" fill="#64748b" font-size="10">1. POST /track {events: [...]}</text>
-  <text x="355" y="420" fill="#64748b" font-size="10">2. 201? clear batch</text>
-  <text x="355" y="435" fill="#64748b" font-size="10">3. Fail? save to buffer.json</text>
-  <text x="355" y="455" fill="#1e293b" font-size="10" font-weight="bold">On startup:</text>
-  <text x="355" y="470" fill="#64748b" font-size="10">Flush stale buffer first</text>
-  <text x="355" y="485" fill="#64748b" font-size="10">JSON-lines format (1 event/line)</text>
+<!-- Lock icon -->
+<g transform="translate(307,148)">
+  <rect x="-12" y="-2" width="24" height="18" rx="3" fill="#E0F2FE" stroke="#0EA5E9" stroke-width="1.2"/>
+  <path d="M-7,-2 L-7,-8 C-7,-14 7,-14 7,-8 L7,-2" fill="none" stroke="#0EA5E9" stroke-width="1.3"/>
+  <circle cx="0" cy="8" r="2.5" fill="#0EA5E9"/>
+</g>
+<text x="307" y="180" text-anchor="middle" class="sb">Defense in Depth</text>
 
-  <!-- Resilience -->
-  <rect x="620" y="340" width="250" height="155" rx="8" fill="white" stroke="#f59e0b" stroke-width="2" filter="url(#shadow)"/>
-  <text x="745" y="365" text-anchor="middle" fill="#f59e0b" font-size="14" font-weight="bold">Resilience</text>
-  <line x1="635" y1="380" x2="855" y2="380" stroke="#fde68a" stroke-width="1"/>
-  <text x="635" y="400" fill="#64748b" font-size="10">Graceful shutdown (SIGINT/SIGTERM)</text>
-  <text x="635" y="418" fill="#64748b" font-size="10">Local disk buffer if backend down</text>
-  <text x="635" y="436" fill="#64748b" font-size="10">Auto-flush buffer on reconnect</text>
-  <text x="635" y="454" fill="#64748b" font-size="10">Thread-safe input counters</text>
-  <text x="635" y="472" fill="#64748b" font-size="10">Error isolation per sample</text>
-  <text x="635" y="490" fill="#64748b" font-size="10">CAPTURE_WINDOW_TITLE toggle</text>
+<rect x="230" y="194" width="154" height="30" rx="6" fill="#E0F2FE" stroke="#BAE6FD" stroke-width=".6"/>
+<text x="240" y="207" class="pill" fill="#0369A1">TLS 1.2+ mandatory</text>
+<text x="240" y="218" fill="#0369A1" font-size="7">All traffic encrypted in transit</text>
 
-  <!-- Sample Schema -->
-  <rect x="900" y="340" width="250" height="155" rx="8" fill="#1e293b" stroke="#475569" stroke-width="2" filter="url(#shadow)"/>
-  <text x="1025" y="365" text-anchor="middle" fill="#f59e0b" font-size="12" font-weight="bold">Sample Schema (per 1s)</text>
-  <text x="915" y="388" fill="#94a3b8" font-size="10" font-family="monospace">timestamp: ISO 8601 UTC</text>
-  <text x="915" y="406" fill="#94a3b8" font-size="10" font-family="monospace">app_name: "Cursor"</text>
-  <text x="915" y="424" fill="#94a3b8" font-size="10" font-family="monospace">window_title: "agent.py"</text>
-  <text x="915" y="442" fill="#94a3b8" font-size="10" font-family="monospace">keystroke_count: 12</text>
-  <text x="915" y="460" fill="#94a3b8" font-size="10" font-family="monospace">mouse_clicks: 3</text>
-  <text x="915" y="478" fill="#94a3b8" font-size="10" font-family="monospace">mouse_distance: 245.7</text>
-  <text x="915" y="496" fill="#94a3b8" font-size="10" font-family="monospace">idle_seconds: 1.2</text>
+<rect x="230" y="232" width="154" height="30" rx="6" fill="#E0F2FE" stroke="#BAE6FD" stroke-width=".6"/>
+<text x="240" y="245" class="pill" fill="#0369A1">WAF / API gateway</text>
+<text x="240" y="256" fill="#0369A1" font-size="7">Header allowlist + bot detection</text>
 
-  <!-- Arrow: Tracker to Backend -->
-  <line x1="600" y1="520" x2="600" y2="580" stroke="#3b82f6" stroke-width="3" marker-end="url(#arrowBlue)"/>
-  <rect x="500" y="535" width="200" height="25" rx="5" fill="#dbeafe" stroke="#3b82f6" stroke-width="1"/>
-  <text x="600" y="552" text-anchor="middle" fill="#1e40af" font-size="11" font-weight="bold">POST /track (batch of 10)</text>
+<rect x="230" y="270" width="154" height="30" rx="6" fill="#E0F2FE" stroke="#BAE6FD" stroke-width=".6"/>
+<text x="240" y="283" class="pill" fill="#0369A1">Rate limiting</text>
+<text x="240" y="294" fill="#0369A1" font-size="7">120 req/min/device &#8226; 512KB max</text>
 
-  <!-- ============================================== -->
-  <!--  LAYER 3: Backend (Flask)                      -->
-  <!-- ============================================== -->
-  <text x="40" y="600" fill="#64748b" font-size="11" font-weight="bold" letter-spacing="2">LAYER 3 - BACKEND (Flask + SQLAlchemy + SQLite)</text>
-  <rect x="30" y="610" width="1140" height="340" rx="10" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
+<rect x="230" y="308" width="154" height="30" rx="6" fill="#E0F2FE" stroke="#BAE6FD" stroke-width=".6"/>
+<text x="240" y="321" class="pill" fill="#0369A1">HSTS + CSP</text>
+<text x="240" y="332" fill="#0369A1" font-size="7">Strict security headers enforced</text>
 
-  <!-- REST API -->
-  <rect x="60" y="630" width="350" height="300" rx="8" fill="white" stroke="#3b82f6" stroke-width="2" filter="url(#shadow)"/>
-  <text x="235" y="655" text-anchor="middle" fill="#3b82f6" font-size="14" font-weight="bold">REST API (app.py)</text>
-  <line x1="75" y1="665" x2="395" y2="665" stroke="#bfdbfe" stroke-width="1"/>
+<rect x="230" y="346" width="154" height="30" rx="6" fill="#E0F2FE" stroke="#BAE6FD" stroke-width=".6"/>
+<text x="240" y="359" class="pill" fill="#0369A1">CORS strict</text>
+<text x="240" y="370" fill="#0369A1" font-size="7">No wildcard &#8226; Origin allowlist</text>
 
-  <rect x="80" y="675" width="310" height="35" rx="5" fill="#dbeafe"/>
-  <text x="90" y="695" fill="#1e40af" font-size="11" font-weight="bold">POST /track</text>
-  <text x="200" y="695" fill="#64748b" font-size="10">Ingest batch into SQLite</text>
+<rect x="230" y="384" width="154" height="30" rx="6" fill="#E0F2FE" stroke="#BAE6FD" stroke-width=".6"/>
+<text x="240" y="397" class="pill" fill="#0369A1">VPN / ZTNA</text>
+<text x="240" y="408" fill="#0369A1" font-size="7">Corporate perimeter &#8226; FW 443 only</text>
 
-  <rect x="80" y="718" width="310" height="35" rx="5" fill="#dcfce7"/>
-  <text x="90" y="738" fill="#166534" font-size="11" font-weight="bold">GET /summary/today</text>
-  <text x="237" y="738" fill="#64748b" font-size="10">bucketize + summarize</text>
+<line x1="228" y1="670" x2="386" y2="670" stroke="#E2E8F0" stroke-width=".4"/>
+<text x="307" y="686" text-anchor="middle" class="tl">Enterprise-grade perimeter</text>
 
-  <rect x="80" y="761" width="310" height="35" rx="5" fill="#fef9c3"/>
-  <text x="90" y="781" fill="#854d0e" font-size="11" font-weight="bold">GET /apps</text>
-  <text x="165" y="781" fill="#64748b" font-size="10">bucketize + app_breakdown</text>
+<line x1="400" y1="365" x2="409" y2="365" stroke="#94A3B8" stroke-width="1.2" marker-end="url(#arr)"/>
 
-  <rect x="80" y="804" width="310" height="35" rx="5" fill="#fce7f3"/>
-  <text x="90" y="824" fill="#9d174d" font-size="11" font-weight="bold">GET /daily?days=7</text>
-  <text x="218" y="824" fill="#64748b" font-size="10">per-day bucketize loop</text>
+<!-- ============================================================ -->
+<!-- ZONE 3 : AUTHENTICATION                                      -->
+<!-- ============================================================ -->
+<rect x="412" y="82" width="182" height="612" rx="10" fill="#FFF" filter="url(#ds)" stroke="#E2E8F0" stroke-width=".5"/>
+<rect x="412" y="82" width="182" height="4" fill="#10B981" clip-path="url(#c3)"/>
+<circle cx="434" cy="102" r="10" fill="#10B981"/>
+<text x="434" y="105" text-anchor="middle" class="zn">03</text>
+<text x="449" y="106" class="zt">Authentication</text>
+<line x1="424" y1="116" x2="582" y2="116" stroke="#E2E8F0" stroke-width=".4"/>
 
-  <rect x="80" y="847" width="310" height="35" rx="5" fill="#f1f5f9"/>
-  <text x="90" y="867" fill="#475569" font-size="11" font-weight="bold">GET /health</text>
-  <text x="178" y="867" fill="#64748b" font-size="10">{"status": "ok"}</text>
+<!-- Shield -->
+<g transform="translate(503,148)">
+  <path d="M0,-20 L16,-13 L16,3 C16,12 0,20 0,20 C0,20 -16,12 -16,3 L-16,-13 Z" fill="#ECFDF5" stroke="#10B981" stroke-width="1.2" stroke-linejoin="round"/>
+  <path d="M-5,-3 L-1,2 L6,-6" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<text x="503" y="180" text-anchor="middle" class="sb">Identity &amp; Access</text>
 
-  <text x="235" y="915" text-anchor="middle" fill="#64748b" font-size="10">Inference at query time: config changes re-evaluate history</text>
+<text x="426" y="200" class="sl" fill="#475569">AGENT AUTH</text>
+<rect x="426" y="208" width="154" height="30" rx="6" fill="#F0FDF4" stroke="#BBF7D0" stroke-width=".6"/>
+<text x="436" y="221" class="pill" fill="#15803D">Bearer device token</text>
+<text x="436" y="232" fill="#15803D" font-size="7">IT-provisioned &#8226; SHA-256 hashed</text>
 
-  <!-- Productivity Engine -->
-  <rect x="440" y="630" width="340" height="300" rx="8" fill="white" stroke="#8b5cf6" stroke-width="2" filter="url(#shadow)"/>
-  <text x="610" y="655" text-anchor="middle" fill="#8b5cf6" font-size="14" font-weight="bold">Productivity Engine</text>
-  <text x="610" y="668" text-anchor="middle" fill="#8b5cf6" font-size="10">(productivity.py)</text>
-  <line x1="455" y1="675" x2="765" y2="675" stroke="#ddd6fe" stroke-width="1"/>
+<rect x="426" y="246" width="154" height="30" rx="6" fill="#F0FDF4" stroke="#BBF7D0" stroke-width=".6"/>
+<text x="436" y="259" class="pill" fill="#15803D">X-LAN-ID header</text>
+<text x="436" y="270" fill="#15803D" font-size="7">Validated against token owner</text>
 
-  <text x="460" y="698" fill="#1e293b" font-size="12" font-weight="bold">Decision Tree:</text>
-  <rect x="460" y="707" width="300" height="26" rx="4" fill="#fef2f2" stroke="#fca5a5" stroke-width="1"/>
-  <text x="470" y="725" fill="#991b1b" font-size="10">1. NON_PRODUCTIVE app? = non_productive</text>
+<rect x="426" y="284" width="154" height="30" rx="6" fill="#F0FDF4" stroke="#BBF7D0" stroke-width=".6"/>
+<text x="436" y="297" class="pill" fill="#15803D">Token rotation</text>
+<text x="436" y="308" fill="#15803D" font-size="7">Revocable + expiry support</text>
 
-  <rect x="460" y="739" width="300" height="26" rx="4" fill="#f0fdf4" stroke="#86efac" stroke-width="1"/>
-  <text x="470" y="757" fill="#166534" font-size="10">2. Interaction >= threshold? = productive</text>
+<text x="426" y="336" class="sl" fill="#475569">ADMIN AUTH</text>
+<rect x="426" y="344" width="154" height="30" rx="6" fill="#F0FDF4" stroke="#BBF7D0" stroke-width=".6"/>
+<text x="436" y="357" class="pill" fill="#15803D">SSO / OIDC</text>
+<text x="436" y="368" fill="#15803D" font-size="7">Azure AD / Okta &#8226; PKCE flow</text>
 
-  <rect x="460" y="771" width="300" height="26" rx="4" fill="#f0fdf4" stroke="#86efac" stroke-width="1"/>
-  <text x="470" y="789" fill="#166534" font-size="10">3. Mouse move + low idle? = productive</text>
+<rect x="426" y="382" width="154" height="30" rx="6" fill="#F0FDF4" stroke="#BBF7D0" stroke-width=".6"/>
+<text x="436" y="395" class="pill" fill="#15803D">MFA enforced at IdP</text>
+<text x="436" y="406" fill="#15803D" font-size="7">No password-only admin login</text>
 
-  <rect x="460" y="803" width="300" height="26" rx="4" fill="#fef2f2" stroke="#fca5a5" stroke-width="1"/>
-  <text x="470" y="821" fill="#991b1b" font-size="10">4. Everything else = non_productive</text>
+<text x="426" y="432" class="sl" fill="#475569">SESSION</text>
+<text x="426" y="446" class="bt">&#8226; Server-side storage</text>
+<text x="426" y="459" class="bt">&#8226; HttpOnly + Secure cookies</text>
+<text x="426" y="472" class="bt">&#8226; SameSite=Lax</text>
+<text x="426" y="485" class="bt">&#8226; 30-min TTL + idle timeout</text>
+<text x="426" y="498" class="bt">&#8226; CSRF (Flask-WTF)</text>
 
-  <text x="460" y="850" fill="#1e293b" font-size="11" font-weight="bold">Confidence Score [0..1]:</text>
-  <text x="460" y="868" fill="#64748b" font-size="10">35% interaction density</text>
-  <text x="460" y="883" fill="#64748b" font-size="10">20% mouse presence signal</text>
-  <text x="460" y="898" fill="#64748b" font-size="10">25% event coverage</text>
-  <text x="460" y="913" fill="#64748b" font-size="10">20% idle penalty (inverted)</text>
+<line x1="424" y1="670" x2="582" y2="670" stroke="#E2E8F0" stroke-width=".4"/>
+<text x="503" y="686" text-anchor="middle" class="tl">Strong auth, zero trust</text>
 
-  <!-- Database + Config -->
-  <rect x="810" y="630" width="340" height="145" rx="8" fill="white" stroke="#f59e0b" stroke-width="2" filter="url(#shadow)"/>
-  <text x="980" y="655" text-anchor="middle" fill="#f59e0b" font-size="14" font-weight="bold">SQLite Database</text>
-  <line x1="825" y1="665" x2="1135" y2="665" stroke="#fde68a" stroke-width="1"/>
-  <text x="825" y="685" fill="#1e293b" font-size="11" font-weight="bold">TelemetryEvent (models.py)</text>
-  <text x="825" y="703" fill="#64748b" font-size="10" font-family="monospace">id | timestamp(indexed) | app_name</text>
-  <text x="825" y="718" fill="#64748b" font-size="10" font-family="monospace">window_title | keystroke_count</text>
-  <text x="825" y="733" fill="#64748b" font-size="10" font-family="monospace">mouse_clicks | mouse_distance</text>
-  <text x="825" y="748" fill="#64748b" font-size="10" font-family="monospace">idle_seconds</text>
-  <text x="825" y="768" fill="#64748b" font-size="9">86,400 rows/day (1 sample/sec)</text>
+<line x1="596" y1="365" x2="605" y2="365" stroke="#94A3B8" stroke-width="1.2" marker-end="url(#arr)"/>
 
-  <rect x="810" y="790" width="340" height="140" rx="8" fill="#1e293b" stroke="#475569" stroke-width="2" filter="url(#shadow)"/>
-  <text x="980" y="815" text-anchor="middle" fill="#f59e0b" font-size="12" font-weight="bold">Config (.env to config.py)</text>
-  <text x="825" y="838" fill="#94a3b8" font-size="10" font-family="monospace">BUCKET_SIZE_SEC=60</text>
-  <text x="825" y="855" fill="#94a3b8" font-size="10" font-family="monospace">PRODUCTIVE_INTERACTION=10</text>
-  <text x="825" y="872" fill="#94a3b8" font-size="10" font-family="monospace">KEYSTROKE_THRESHOLD=5</text>
-  <text x="825" y="889" fill="#94a3b8" font-size="10" font-family="monospace">MOUSE_THRESHOLD=3</text>
-  <text x="825" y="906" fill="#94a3b8" font-size="10" font-family="monospace">MOUSE_MOVEMENT=50 IDLE_AWAY=30</text>
-  <text x="825" y="923" fill="#94a3b8" font-size="10" font-family="monospace">NON_PRODUCTIVE_APPS=youtube,...</text>
+<!-- ============================================================ -->
+<!-- ZONE 4 : BACKEND API                                         -->
+<!-- ============================================================ -->
+<rect x="608" y="82" width="182" height="612" rx="10" fill="#FFF" filter="url(#ds)" stroke="#E2E8F0" stroke-width=".5"/>
+<rect x="608" y="82" width="182" height="4" fill="#6366F1" clip-path="url(#c4)"/>
+<circle cx="630" cy="102" r="10" fill="#6366F1"/>
+<text x="630" y="105" text-anchor="middle" class="zn">04</text>
+<text x="645" y="106" class="zt">Backend API</text>
+<line x1="620" y1="116" x2="778" y2="116" stroke="#E2E8F0" stroke-width=".4"/>
 
-  <!-- Arrow: Backend to Frontend -->
-  <line x1="600" y1="955" x2="600" y2="1010" stroke="#8b5cf6" stroke-width="3" marker-end="url(#arrowPurple)"/>
-  <rect x="480" y="968" width="240" height="25" rx="5" fill="#f3e8ff" stroke="#8b5cf6" stroke-width="1"/>
-  <text x="600" y="985" text-anchor="middle" fill="#6d28d9" font-size="11" font-weight="bold">GET /summary, /apps, /daily</text>
+<!-- Server icon -->
+<g transform="translate(699,142)">
+  <rect x="-20" y="-14" width="40" height="10" rx="2" fill="none" stroke="#6366F1" stroke-width="1"/>
+  <circle cx="13" cy="-9" r="1.5" fill="#6366F1" opacity=".4"/><circle cx="17" cy="-9" r="1.5" fill="#6366F1"/>
+  <rect x="-20" y="0" width="40" height="10" rx="2" fill="none" stroke="#6366F1" stroke-width="1"/>
+  <circle cx="13" cy="5" r="1.5" fill="#6366F1" opacity=".4"/><circle cx="17" cy="5" r="1.5" fill="#6366F1"/>
+  <rect x="-20" y="14" width="40" height="10" rx="2" fill="none" stroke="#6366F1" stroke-width="1"/>
+  <circle cx="13" cy="19" r="1.5" fill="#6366F1" opacity=".4"/><circle cx="17" cy="19" r="1.5" fill="#6366F1"/>
+</g>
+<text x="699" y="180" text-anchor="middle" class="sb">Flask + Blueprints</text>
 
-  <!-- ============================================== -->
-  <!--  LAYER 4: Frontend (Streamlit)                 -->
-  <!-- ============================================== -->
-  <text x="40" y="1030" fill="#64748b" font-size="11" font-weight="bold" letter-spacing="2">LAYER 4 - FRONTEND (Streamlit + Plotly)</text>
-  <rect x="30" y="1040" width="1140" height="175" rx="10" fill="#fdf4ff" stroke="#d8b4fe" stroke-width="1.5"/>
+<text x="622" y="200" class="sl" fill="#475569">INGESTION</text>
+<text x="622" y="214" class="bt">&#8226; POST /track</text>
+<text x="622" y="227" class="bt">&#8226; POST /tracker/ingest</text>
+<text x="622" y="240" class="bt">&#8226; Schema validation</text>
+<text x="622" y="253" class="bt">&#8226; Timestamp verification</text>
+<text x="622" y="266" class="bt">&#8226; LAN-ID membership check</text>
 
-  <rect x="60" y="1060" width="180" height="135" rx="8" fill="white" stroke="#22c55e" stroke-width="2" filter="url(#shadow)"/>
-  <rect x="120" y="1068" width="40" height="20" rx="3" fill="#dcfce7"/>
-  <text x="140" y="1082" text-anchor="middle" fill="#22c55e" font-size="10" font-weight="bold">#</text>
-  <text x="150" y="1108" text-anchor="middle" fill="#1e293b" font-size="12" font-weight="bold">Metric Cards</text>
-  <text x="150" y="1128" text-anchor="middle" fill="#64748b" font-size="10">Productive time</text>
-  <text x="150" y="1143" text-anchor="middle" fill="#64748b" font-size="10">Non-productive time</text>
-  <text x="150" y="1158" text-anchor="middle" fill="#64748b" font-size="10">Total tracked</text>
-  <text x="150" y="1178" text-anchor="middle" fill="#64748b" font-size="9">st.metric + st.columns</text>
+<text x="622" y="288" class="sl" fill="#475569">PROCESSING</text>
+<text x="622" y="302" class="bt">&#8226; 10-sec aggregation</text>
+<text x="622" y="315" class="bt">&#8226; App name normalization</text>
+<text x="622" y="328" class="bt">&#8226; Title redaction</text>
+<text x="622" y="341" class="bt">&#8226; DROP_TITLES enforcement</text>
+<text x="622" y="354" class="bt">&#8226; Anti-cheat variance</text>
 
-  <rect x="270" y="1060" width="180" height="135" rx="8" fill="white" stroke="#ef4444" stroke-width="2" filter="url(#shadow)"/>
-  <circle cx="360" cy="1078" r="10" fill="#fef2f2" stroke="#ef4444" stroke-width="1.5"/>
-  <text x="360" y="1082" text-anchor="middle" fill="#ef4444" font-size="9" font-weight="bold">%</text>
-  <text x="360" y="1108" text-anchor="middle" fill="#1e293b" font-size="12" font-weight="bold">Pie + Gauge</text>
-  <text x="360" y="1128" text-anchor="middle" fill="#64748b" font-size="10">State distribution</text>
-  <text x="360" y="1143" text-anchor="middle" fill="#64748b" font-size="10">Productivity score %</text>
-  <text x="360" y="1158" text-anchor="middle" fill="#64748b" font-size="10">Green/Red donut</text>
-  <text x="360" y="1178" text-anchor="middle" fill="#64748b" font-size="9">px.pie + go.Indicator</text>
+<text x="622" y="376" class="sl" fill="#475569">READ APIs</text>
+<text x="622" y="390" class="bt">&#8226; GET /summary/today</text>
+<text x="622" y="403" class="bt">&#8226; GET /apps, /daily</text>
+<text x="622" y="416" class="bt">&#8226; GET /dashboard/&#x3C;user&#x3E;</text>
+<text x="622" y="429" class="bt">&#8226; GET /admin/leaderboard</text>
 
-  <rect x="480" y="1060" width="180" height="135" rx="8" fill="white" stroke="#3b82f6" stroke-width="2" filter="url(#shadow)"/>
-  <rect x="545" y="1068" width="30" height="20" rx="3" fill="#dbeafe"/>
-  <text x="560" y="1082" text-anchor="middle" fill="#3b82f6" font-size="10" font-weight="bold">||</text>
-  <text x="570" y="1108" text-anchor="middle" fill="#1e293b" font-size="12" font-weight="bold">App Breakdown</text>
-  <text x="570" y="1128" text-anchor="middle" fill="#64748b" font-size="10">Horizontal stacked bar</text>
-  <text x="570" y="1143" text-anchor="middle" fill="#64748b" font-size="10">Per-app productive vs not</text>
-  <text x="570" y="1158" text-anchor="middle" fill="#64748b" font-size="10">Sorted by total time</text>
-  <text x="570" y="1178" text-anchor="middle" fill="#64748b" font-size="9">px.bar (horizontal)</text>
+<text x="622" y="451" class="sl" fill="#475569">MIDDLEWARE</text>
+<text x="622" y="465" class="bt">&#8226; Request-ID (UUID)</text>
+<text x="622" y="478" class="bt">&#8226; Security headers</text>
+<text x="622" y="491" class="bt">&#8226; Flask-Limiter</text>
 
-  <rect x="690" y="1060" width="180" height="135" rx="8" fill="white" stroke="#8b5cf6" stroke-width="2" filter="url(#shadow)"/>
-  <polyline points="720,1088 740,1072 760,1080 780,1068" fill="none" stroke="#8b5cf6" stroke-width="2"/>
-  <text x="780" y="1108" text-anchor="middle" fill="#1e293b" font-size="12" font-weight="bold">Daily Trend</text>
-  <text x="780" y="1128" text-anchor="middle" fill="#64748b" font-size="10">Line chart (per state)</text>
-  <text x="780" y="1143" text-anchor="middle" fill="#64748b" font-size="10">Stacked area chart</text>
-  <text x="780" y="1158" text-anchor="middle" fill="#64748b" font-size="10">Configurable days</text>
-  <text x="780" y="1178" text-anchor="middle" fill="#64748b" font-size="9">px.line + px.area</text>
+<line x1="620" y1="670" x2="778" y2="670" stroke="#E2E8F0" stroke-width=".4"/>
+<text x="699" y="686" text-anchor="middle" class="tl">Your data, your infrastructure</text>
 
-  <rect x="900" y="1060" width="250" height="135" rx="8" fill="#1e293b" stroke="#475569" stroke-width="2" filter="url(#shadow)"/>
-  <text x="1025" y="1085" text-anchor="middle" fill="#f59e0b" font-size="12" font-weight="bold">Controls (Sidebar)</text>
-  <text x="915" y="1108" fill="#94a3b8" font-size="10">Trend days slider (1-30)</text>
-  <text x="915" y="1128" fill="#94a3b8" font-size="10">Auto-refresh toggle (30s)</text>
-  <text x="915" y="1148" fill="#94a3b8" font-size="10">Responsive wide layout</text>
-  <text x="915" y="1168" fill="#94a3b8" font-size="10">Port 8501 (Streamlit default)</text>
-  <text x="915" y="1188" fill="#94a3b8" font-size="10">Browser: http://localhost:8501</text>
+<line x1="792" y1="365" x2="801" y2="365" stroke="#94A3B8" stroke-width="1.2" marker-end="url(#arr)"/>
 
-  <!-- ============================================== -->
-  <!--  DATA FLOW + KEY DECISIONS                     -->
-  <!-- ============================================== -->
-  <rect x="30" y="1240" width="1140" height="350" rx="10" fill="white" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
-  <text x="600" y="1270" text-anchor="middle" fill="#1e293b" font-size="16" font-weight="bold">Data Flow and Key Design Decisions</text>
+<!-- ============================================================ -->
+<!-- ZONE 5 : AUTHORIZATION                                       -->
+<!-- ============================================================ -->
+<rect x="804" y="82" width="182" height="612" rx="10" fill="#FFF" filter="url(#ds)" stroke="#E2E8F0" stroke-width=".5"/>
+<rect x="804" y="82" width="182" height="4" fill="#F43F5E" clip-path="url(#c5)"/>
+<circle cx="826" cy="102" r="10" fill="#F43F5E"/>
+<text x="826" y="105" text-anchor="middle" class="zn">05</text>
+<text x="841" y="106" class="zt">Authorization</text>
+<line x1="816" y1="116" x2="974" y2="116" stroke="#E2E8F0" stroke-width=".4"/>
 
-  <!-- Pipeline -->
-  <text x="60" y="1300" fill="#1e293b" font-size="12" font-weight="bold">Complete Data Pipeline:</text>
-  <rect x="60" y="1310" width="120" height="30" rx="5" fill="#f1f5f9" stroke="#64748b"/>
-  <text x="120" y="1330" text-anchor="middle" fill="#1e293b" font-size="10">OS Hardware</text>
-  <line x1="185" y1="1325" x2="220" y2="1325" stroke="#64748b" stroke-width="2" marker-end="url(#arrowGray)"/>
+<!-- Key icon -->
+<g transform="translate(895,148)">
+  <circle cx="0" cy="-6" r="8" fill="#FFF1F2" stroke="#F43F5E" stroke-width="1.2"/>
+  <circle cx="0" cy="-6" r="3" fill="none" stroke="#F43F5E" stroke-width="1"/>
+  <line x1="0" y1="2" x2="0" y2="18" stroke="#F43F5E" stroke-width="1.2"/>
+  <line x1="0" y1="12" x2="5" y2="12" stroke="#F43F5E" stroke-width="1.2"/>
+  <line x1="0" y1="16" x2="5" y2="16" stroke="#F43F5E" stroke-width="1.2"/>
+</g>
+<text x="895" y="180" text-anchor="middle" class="sb">Team Isolation</text>
 
-  <rect x="225" y="1310" width="140" height="30" rx="5" fill="#ecfdf5" stroke="#22c55e"/>
-  <text x="295" y="1330" text-anchor="middle" fill="#1e293b" font-size="10">Zinnia Axion (1s poll)</text>
-  <line x1="370" y1="1325" x2="405" y2="1325" stroke="#64748b" stroke-width="2" marker-end="url(#arrowGray)"/>
+<rect x="818" y="194" width="154" height="26" rx="5" fill="#FFF1F2" stroke="#FECDD3" stroke-width=".6"/>
+<text x="828" y="211" fill="#BE123C" font-size="8.5" font-weight="700">team_id NEVER from client</text>
 
-  <rect x="410" y="1310" width="140" height="30" rx="5" fill="#dbeafe" stroke="#3b82f6"/>
-  <text x="480" y="1330" text-anchor="middle" fill="#1e293b" font-size="10">POST /track (10s)</text>
-  <line x1="555" y1="1325" x2="590" y2="1325" stroke="#64748b" stroke-width="2" marker-end="url(#arrowGray)"/>
+<text x="818" y="238" class="sl" fill="#475569">RBAC DECORATORS</text>
+<text x="818" y="252" class="bt">&#8226; @admin_required</text>
+<text x="818" y="265" class="bt">&#8226; @team_scoped</text>
+<text x="818" y="278" class="bt">&#8226; g.current_team_id</text>
+<text x="818" y="291" class="bt">&#8226; Server-side derivation</text>
 
-  <rect x="595" y="1310" width="120" height="30" rx="5" fill="#fef9c3" stroke="#f59e0b"/>
-  <text x="655" y="1330" text-anchor="middle" fill="#1e293b" font-size="10">SQLite Store</text>
-  <line x1="720" y1="1325" x2="755" y2="1325" stroke="#64748b" stroke-width="2" marker-end="url(#arrowGray)"/>
+<text x="818" y="314" class="sl" fill="#475569">TEAM MODEL</text>
+<text x="818" y="328" class="bt">&#8226; Manager &#8594; 1 team only</text>
+<text x="818" y="341" class="bt">&#8226; User &#8594; 1 active team</text>
+<text x="818" y="354" class="bt">&#8226; Cross-team move needs</text>
+<text x="818" y="367" class="bt">   approval workflow</text>
 
-  <rect x="760" y="1310" width="140" height="30" rx="5" fill="#f3e8ff" stroke="#8b5cf6"/>
-  <text x="830" y="1330" text-anchor="middle" fill="#1e293b" font-size="10">GET APIs (query)</text>
-  <line x1="905" y1="1325" x2="940" y2="1325" stroke="#64748b" stroke-width="2" marker-end="url(#arrowGray)"/>
+<text x="818" y="390" class="sl" fill="#475569">PROTECTIONS</text>
+<text x="818" y="404" class="bt">&#8226; IDOR blocked + logged</text>
+<text x="818" y="417" class="bt">&#8226; URL param ignored</text>
+<text x="818" y="430" class="bt">&#8226; Query param ignored</text>
+<text x="818" y="443" class="bt">&#8226; Form field ignored</text>
+<text x="818" y="456" class="bt">&#8226; All scoping server-side</text>
 
-  <rect x="945" y="1310" width="120" height="30" rx="5" fill="#fdf4ff" stroke="#d946ef"/>
-  <text x="1005" y="1330" text-anchor="middle" fill="#1e293b" font-size="10">Dashboard UI</text>
+<text x="818" y="478" class="sl" fill="#475569">ROLES</text>
+<rect x="818" y="486" width="62" height="18" rx="9" fill="#DCFCE7"/>
+<text x="849" y="499" text-anchor="middle" fill="#16A34A" font-size="7.5" font-weight="700">manager</text>
+<rect x="886" y="486" width="80" height="18" rx="9" fill="#FEF3C7"/>
+<text x="926" y="499" text-anchor="middle" fill="#D97706" font-size="7.5" font-weight="700">superadmin</text>
 
-  <!-- Key Decisions -->
-  <text x="60" y="1375" fill="#1e293b" font-size="12" font-weight="bold">Key Architectural Decisions:</text>
+<line x1="816" y1="670" x2="974" y2="670" stroke="#E2E8F0" stroke-width=".4"/>
+<text x="895" y="686" text-anchor="middle" class="tl">Strict team-scoped access</text>
 
-  <circle cx="70" cy="1392" r="4" fill="#22c55e"/>
-  <text x="82" y="1396" fill="#1e293b" font-size="11">Inference at query time - changing thresholds in .env instantly re-evaluates all historical data</text>
+<line x1="988" y1="365" x2="997" y2="365" stroke="#94A3B8" stroke-width="1.2" marker-end="url(#arr)"/>
 
-  <circle cx="70" cy="1414" r="4" fill="#3b82f6"/>
-  <text x="82" y="1418" fill="#1e293b" font-size="11">Raw events stored, not pre-computed states - maximum flexibility for future analysis</text>
+<!-- ============================================================ -->
+<!-- ZONE 6 : DATA & AUDIT                                        -->
+<!-- ============================================================ -->
+<rect x="1000" y="82" width="182" height="612" rx="10" fill="#FFF" filter="url(#ds)" stroke="#E2E8F0" stroke-width=".5"/>
+<rect x="1000" y="82" width="182" height="4" fill="#F59E0B" clip-path="url(#c6)"/>
+<circle cx="1022" cy="102" r="10" fill="#F59E0B"/>
+<text x="1022" y="105" text-anchor="middle" class="zn">06</text>
+<text x="1037" y="106" class="zt">Data &amp; Audit</text>
+<line x1="1012" y1="116" x2="1170" y2="116" stroke="#E2E8F0" stroke-width=".4"/>
 
-  <circle cx="70" cy="1436" r="4" fill="#8b5cf6"/>
-  <text x="82" y="1440" fill="#1e293b" font-size="11">Platform abstraction - only tracker/platform/ changes per OS; backend + frontend are universal</text>
+<!-- DB icon -->
+<g transform="translate(1091,142)">
+  <ellipse cx="0" cy="-12" rx="18" ry="7" fill="#FEF3C7" stroke="#F59E0B" stroke-width="1"/>
+  <path d="M-18,-12 L-18,8 C-18,12 -10,15 0,15 C10,15 18,12 18,8 L18,-12" fill="none" stroke="#F59E0B" stroke-width="1"/>
+  <path d="M-18,-2 C-18,2 -10,5 0,5 C10,5 18,2 18,-2" fill="none" stroke="#F59E0B" stroke-width=".6" opacity=".5"/>
+</g>
+<text x="1091" y="172" text-anchor="middle" class="sb">PostgreSQL</text>
 
-  <circle cx="70" cy="1458" r="4" fill="#f59e0b"/>
-  <text x="82" y="1462" fill="#1e293b" font-size="11">Privacy by design - keystroke counts only, never content; window titles are the most sensitive field</text>
+<text x="1014" y="192" class="sl" fill="#475569">TABLES</text>
+<text x="1014" y="206" class="bt">&#8226; telemetry_events</text>
+<text x="1014" y="219" class="bt">&#8226; users, teams</text>
+<text x="1014" y="232" class="bt">&#8226; memberships, managers</text>
+<text x="1014" y="245" class="bt">&#8226; device_tokens (hashed)</text>
+<text x="1014" y="258" class="bt">&#8226; team_change_requests</text>
 
-  <circle cx="70" cy="1480" r="4" fill="#ef4444"/>
-  <text x="82" y="1484" fill="#1e293b" font-size="11">Resilience - local JSON buffer survives backend crashes; auto-flush on reconnect</text>
+<text x="1014" y="280" class="sl" fill="#475569">SECURITY</text>
+<rect x="1014" y="288" width="154" height="26" rx="5" fill="#FFFBEB" stroke="#FDE68A" stroke-width=".6"/>
+<text x="1024" y="305" fill="#92400E" font-size="8.5" font-weight="600">Row-Level Security (RLS)</text>
+<text x="1014" y="330" class="bt">&#8226; Encryption at rest (TDE)</text>
+<text x="1014" y="343" class="bt">&#8226; SET LOCAL team_id</text>
+<text x="1014" y="356" class="bt">&#8226; Network-restricted access</text>
 
-  <!-- Thresholds -->
-  <text x="60" y="1515" fill="#1e293b" font-size="12" font-weight="bold">Threshold Summary (configurable via .env):</text>
-  <text x="60" y="1535" fill="#64748b" font-size="11">Bucket: 60s | Combined: >=10 | Keystrokes: >=5 | Clicks: >=3 | Mouse movement: >=50px | Idle away: >=30s</text>
+<text x="1014" y="378" class="sl" fill="#475569">AUDIT LOG</text>
+<text x="1014" y="392" class="bt">&#8226; Append-only / immutable</text>
+<text x="1014" y="405" class="bt">&#8226; Actor, target, team, IP</text>
+<text x="1014" y="418" class="bt">&#8226; Request-ID correlation</text>
+<text x="1014" y="431" class="bt">&#8226; User-Agent captured</text>
+<text x="1014" y="444" class="bt">&#8226; Login / logout / access</text>
 
-  <text x="60" y="1560" fill="#1e293b" font-size="12" font-weight="bold">Non-Productive Apps (always blocked):</text>
-  <text x="60" y="1578" fill="#ef4444" font-size="11">youtube, netflix, reddit, twitter, x.com, instagram, facebook, tiktok, twitch, discord, spotify, steam, epic games</text>
+<text x="1014" y="466" class="sl" fill="#475569">RETENTION</text>
+<text x="1014" y="480" class="bt">&#8226; 14&#8211;90 days (configurable)</text>
+<text x="1014" y="493" class="bt">&#8226; Automated cleanup</text>
+<text x="1014" y="506" class="bt">&#8226; Encrypted backups</text>
+
+<line x1="1012" y1="670" x2="1170" y2="670" stroke="#E2E8F0" stroke-width=".4"/>
+<text x="1091" y="686" text-anchor="middle" class="tl">Audit-ready by default</text>
+
+<line x1="1184" y1="365" x2="1193" y2="365" stroke="#94A3B8" stroke-width="1.2" marker-end="url(#arr)"/>
+
+<!-- ============================================================ -->
+<!-- ZONE 7 : DASHBOARDS                                          -->
+<!-- ============================================================ -->
+<rect x="1196" y="82" width="182" height="612" rx="10" fill="#FFF" filter="url(#ds)" stroke="#E2E8F0" stroke-width=".5"/>
+<rect x="1196" y="82" width="182" height="4" fill="#8B5CF6" clip-path="url(#c7)"/>
+<circle cx="1218" cy="102" r="10" fill="#8B5CF6"/>
+<text x="1218" y="105" text-anchor="middle" class="zn">07</text>
+<text x="1233" y="106" class="zt">Dashboards</text>
+<line x1="1208" y1="116" x2="1366" y2="116" stroke="#E2E8F0" stroke-width=".4"/>
+
+<!-- Chart icon -->
+<g transform="translate(1287,144)">
+  <rect x="-20" y="-12" width="40" height="26" rx="3" fill="#F5F3FF" stroke="#8B5CF6" stroke-width="1"/>
+  <rect x="-14" y="4" width="6" height="8" rx="1" fill="#8B5CF6" opacity=".3"/>
+  <rect x="-5" y="-2" width="6" height="14" rx="1" fill="#8B5CF6" opacity=".5"/>
+  <rect x="4" y="-6" width="6" height="18" rx="1" fill="#8B5CF6" opacity=".7"/>
+</g>
+<text x="1287" y="180" text-anchor="middle" class="sb">What Leaders See</text>
+
+<text x="1210" y="200" class="sl" fill="#475569">MANAGER VIEW</text>
+<text x="1210" y="214" class="bt">&#8226; SSO login required</text>
+<text x="1210" y="227" class="bt">&#8226; RBAC: own team ONLY</text>
+<text x="1210" y="240" class="bt">&#8226; Team leaderboard</text>
+<text x="1210" y="253" class="bt">&#8226; App breakdown</text>
+<text x="1210" y="266" class="bt">&#8226; User management</text>
+<text x="1210" y="279" class="bt">&#8226; Audit log viewer</text>
+
+<rect x="1210" y="294" width="154" height="24" rx="5" fill="#F0FDF4" stroke="#BBF7D0" stroke-width=".6"/>
+<text x="1222" y="310" fill="#15803D" font-size="8.5" font-weight="700">&#10003; Aggregated trends only</text>
+
+<rect x="1210" y="324" width="154" height="24" rx="5" fill="#FFF1F2" stroke="#FECDD3" stroke-width=".6"/>
+<text x="1222" y="340" fill="#BE123C" font-size="8.5" font-weight="700">&#10007; No raw content views</text>
+
+<!-- Mini chart -->
+<polyline points="1214,374 1230,370 1246,372 1262,364 1278,366 1294,360 1310,356 1326,358 1342,352 1360,346" fill="none" stroke="#8B5CF6" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="1214,386 1230,389 1246,384 1262,390 1278,387 1294,392 1310,395 1326,391 1342,396 1360,400" fill="none" stroke="#EF4444" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="3,2"/>
+<line x1="1214" y1="410" x2="1228" y2="410" stroke="#8B5CF6" stroke-width="1.3"/>
+<text x="1232" y="413" fill="#64748B" font-size="6.5">Productive</text>
+<line x1="1285" y1="410" x2="1299" y2="410" stroke="#EF4444" stroke-width="1" stroke-dasharray="3,2"/>
+<text x="1303" y="413" fill="#64748B" font-size="6.5">Non-Prod.</text>
+
+<text x="1210" y="436" class="sl" fill="#475569">INDIVIDUAL VIEW</text>
+<text x="1210" y="450" class="bt">&#8226; User sees own data only</text>
+<text x="1210" y="463" class="bt">&#8226; Read-only summaries</text>
+<text x="1210" y="476" class="bt">&#8226; Streamlit web app</text>
+
+<text x="1210" y="500" class="sl" fill="#475569">KEY METRICS</text>
+<text x="1210" y="514" class="bt">&#8226; TPI (Team Productivity)</text>
+<text x="1210" y="527" class="bt">&#8226; Distraction Load %</text>
+<text x="1210" y="540" class="bt">&#8226; Engagement Spread</text>
+<text x="1210" y="553" class="bt">&#8226; Coverage hours</text>
+
+<line x1="1208" y1="670" x2="1366" y2="670" stroke="#E2E8F0" stroke-width=".4"/>
+<text x="1287" y="686" text-anchor="middle" class="tl">Actionable intelligence, daily</text>
+
+<!-- ============================================================ -->
+<!-- LEGEND BAR                                                   -->
+<!-- ============================================================ -->
+<rect x="20" y="712" width="1358" height="38" rx="8" fill="#FFF" stroke="#E2E8F0" stroke-width=".5"/>
+
+<text x="40" y="734" fill="#475569" font-size="7.5" font-weight="700" letter-spacing=".8">LEGEND</text>
+<rect x="92" y="726" width="9" height="9" rx="2" fill="#3B82F6"/>
+<text x="106" y="735" fill="#334155" font-size="8">Endpoints</text>
+<rect x="166" y="726" width="9" height="9" rx="2" fill="#0EA5E9"/>
+<text x="180" y="735" fill="#334155" font-size="8">Network</text>
+<rect x="232" y="726" width="9" height="9" rx="2" fill="#10B981"/>
+<text x="246" y="735" fill="#334155" font-size="8">Auth</text>
+<rect x="280" y="726" width="9" height="9" rx="2" fill="#6366F1"/>
+<text x="294" y="735" fill="#334155" font-size="8">Backend</text>
+<rect x="348" y="726" width="9" height="9" rx="2" fill="#F43F5E"/>
+<text x="362" y="735" fill="#334155" font-size="8">AuthZ</text>
+<rect x="398" y="726" width="9" height="9" rx="2" fill="#F59E0B"/>
+<text x="412" y="735" fill="#334155" font-size="8">Data</text>
+<rect x="448" y="726" width="9" height="9" rx="2" fill="#8B5CF6"/>
+<text x="462" y="735" fill="#334155" font-size="8">Dashboards</text>
+
+<line x1="526" y1="720" x2="526" y2="744" stroke="#E2E8F0" stroke-width=".4"/>
+<text x="542" y="735" fill="#64748B" font-size="7" font-weight="600" letter-spacing=".4">PLATFORMS</text>
+<text x="610" y="735" fill="#334155" font-size="8">macOS / Windows</text>
+
+<line x1="700" y1="720" x2="700" y2="744" stroke="#E2E8F0" stroke-width=".4"/>
+<text x="716" y="735" fill="#64748B" font-size="7" font-weight="600" letter-spacing=".4">RETENTION</text>
+<text x="778" y="735" fill="#334155" font-size="8">14&#8211;90 days</text>
+
+<line x1="840" y1="720" x2="840" y2="744" stroke="#E2E8F0" stroke-width=".4"/>
+<text x="856" y="735" fill="#64748B" font-size="7" font-weight="600" letter-spacing=".4">DEPLOY</text>
+<text x="900" y="735" fill="#334155" font-size="8">On-prem / hosted</text>
+
+<line x1="984" y1="720" x2="984" y2="744" stroke="#E2E8F0" stroke-width=".4"/>
+<text x="1000" y="735" fill="#64748B" font-size="7" font-weight="600" letter-spacing=".4">AUTH</text>
+<text x="1030" y="735" fill="#334155" font-size="8">SSO + MFA (admins) &#8226; Device tokens (agents)</text>
+
+<line x1="1238" y1="720" x2="1238" y2="744" stroke="#E2E8F0" stroke-width=".4"/>
+<text x="1254" y="735" fill="#64748B" font-size="7" font-weight="600" letter-spacing=".4">PHASE</text>
+<text x="1290" y="735" fill="#334155" font-size="8">Demo &#8594; Prod</text>
+
+<!-- ============================================================ -->
+<!-- FOOTER                                                       -->
+<!-- ============================================================ -->
+<rect x="20" y="764" width="1358" height="32" rx="8" fill="#0F172A" opacity=".04"/>
+<text x="700" y="780" text-anchor="middle" fill="#64748B" font-size="9.5" font-weight="500">Data is inferred from app categories and interaction counts only &#8212; no keystroke content, screenshots, or personal data captured.</text>
+<text x="700" y="796" text-anchor="middle" fill="#94A3B8" font-size="8.5">Role-based dashboards for aggregated reporting &#x2022; Demo phase &#x2192; limited production rollout pending security review</text>
+
+<text x="1360" y="826" text-anchor="end" fill="#CBD5E1" font-size="7" font-weight="500">Zinnia Axion v1.0 &#8212; Architecture</text>
+<text x="40" y="826" fill="#CBD5E1" font-size="7" font-weight="500">Zinnia &#169; 2026 &#x2022; Internal / Confidential</text>
+
 </svg>

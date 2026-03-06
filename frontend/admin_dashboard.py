@@ -449,9 +449,17 @@ _CHART_LAYOUT = dict(
 
 # ── API helpers ──────────────────────────────────────────────────────
 
+def _auth_headers() -> dict:
+    """Return headers that identify the current manager to the backend."""
+    uid = st.session_state.get("user_id")
+    if uid:
+        return {"X-Manager-User-Id": str(uid)}
+    return {}
+
+
 def _get(path: str, params: dict | None = None):
     try:
-        resp = requests.get(f"{API_BASE}{path}", params=params, timeout=5)
+        resp = requests.get(f"{API_BASE}{path}", params=params, headers=_auth_headers(), timeout=5)
         resp.raise_for_status()
         return resp.json()
     except requests.RequestException as exc:
@@ -461,12 +469,185 @@ def _get(path: str, params: dict | None = None):
 
 def _delete(path: str):
     try:
-        resp = requests.delete(f"{API_BASE}{path}", timeout=5)
+        resp = requests.delete(f"{API_BASE}{path}", headers=_auth_headers(), timeout=5)
         resp.raise_for_status()
         return resp.json()
     except requests.RequestException as exc:
         st.error(f"API error ({path}): {exc}")
         return None
+
+
+# ── SSO Login Gate ───────────────────────────────────────────────────
+
+def _show_login_page():
+    """Render a professional SSO login page. Returns True if user logs in."""
+    st.markdown("""
+    <style>
+    .sso-container {
+        display: flex; flex-direction: column; align-items: center;
+        justify-content: center; min-height: 60vh; text-align: center;
+    }
+    .sso-card {
+        background: var(--za-surface); border: 1px solid var(--za-border);
+        border-radius: 16px; padding: 48px 56px; max-width: 440px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.06); text-align: center;
+    }
+    .sso-lock {
+        font-size: 2.8rem; margin-bottom: 8px; opacity: 0.85;
+    }
+    .sso-heading {
+        font-size: 1.6rem; font-weight: 800; color: var(--za-text);
+        margin-bottom: 4px; letter-spacing: -0.5px;
+    }
+    .sso-sub {
+        font-size: 0.85rem; color: var(--za-text-muted);
+        margin-bottom: 32px; line-height: 1.5;
+    }
+    .sso-footer {
+        margin-top: 24px; font-size: 0.7rem; color: var(--za-text-faint);
+        line-height: 1.4;
+    }
+    .sso-badge {
+        display: inline-block; padding: 3px 10px; border-radius: 4px;
+        background: var(--za-green-bg); color: var(--za-green);
+        border: 1px solid var(--za-green-bdr);
+        font-size: 0.65rem; font-weight: 600; text-transform: uppercase;
+        letter-spacing: 0.5px; margin-top: 16px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    _logo_html = (
+        f'<img src="data:image/png;base64,{_logo_b64}" '
+        f'style="height:60px; margin-bottom:16px;">'
+        if _logo_b64 else ""
+    )
+
+    st.markdown(f"""
+    <div class="sso-container">
+        <div class="sso-card">
+            {_logo_html}
+            <div class="sso-lock">&#128274;</div>
+            <div class="sso-heading">Zinnia Axion</div>
+            <div class="sso-sub">
+                Manager Portal<br>
+                <span style="font-size:0.75rem; color:var(--za-text-faint);">
+                    Sign in with your corporate identity to access the dashboard.
+                </span>
+            </div>
+    """, unsafe_allow_html=True)
+
+    col1, col2, col3 = st.columns([1.2, 2, 1.2])
+    with col2:
+        _managers = {
+            "Wasim Shaikh (Lifecad)": "demo_manager",
+            "Atharva Tippe (Axion)": "atharva_mgr",
+            "Nikhil Saxena (Engineering)": "nikhil",
+        }
+        _selected = st.selectbox(
+            "Sign in as", list(_managers.keys()), index=0, key="sso_manager_pick",
+        )
+        clicked = st.button("Sign in with SSO", type="primary", use_container_width=True)
+        if clicked:
+            st.session_state["_login_lan_id"] = _managers[_selected]
+
+    st.markdown("""
+            <div class="sso-footer">
+                Protected by OIDC / SAML Single Sign-On<br>
+                Access is restricted to authorized managers only.
+            </div>
+            <div class="sso-badge">Enterprise SSO</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    return clicked
+
+
+_SESSION_FILE = _project_root / ".admin_session.json"
+
+
+def _save_session(data: dict):
+    """Persist login state to a file so it survives full page reloads."""
+    import json as _json
+    _SESSION_FILE.write_text(_json.dumps(data))
+
+
+def _load_session() -> dict | None:
+    """Restore login state from file if session_state was lost."""
+    import json as _json
+    if _SESSION_FILE.exists():
+        try:
+            return _json.loads(_SESSION_FILE.read_text())
+        except (ValueError, OSError):
+            return None
+    return None
+
+
+def _clear_session():
+    """Remove persisted login state."""
+    _SESSION_FILE.unlink(missing_ok=True)
+
+
+def _do_login():
+    """Authenticate via backend and store manager identity."""
+    lan_id = st.session_state.pop("_login_lan_id", None)
+
+    if lan_id:
+        resp = requests.get(
+            f"{API_BASE}/admin/login", params={"as": lan_id},
+            timeout=5, allow_redirects=False,
+        )
+        uid = resp.json().get("user_id") if resp.ok else None
+    else:
+        requests.get(f"{API_BASE}/admin/login", timeout=5, allow_redirects=False)
+        uid = None
+
+    if uid:
+        st.session_state["user_id"] = uid
+    headers = {"X-Manager-User-Id": str(uid)} if uid else {}
+
+    try:
+        me_resp = requests.get(f"{API_BASE}/admin/me", headers=headers, timeout=5)
+        me_resp.raise_for_status()
+        me = me_resp.json()
+    except Exception:
+        me = _get("/admin/me")
+
+    if me and "manager_name" in me:
+        session_data = {
+            "logged_in": True,
+            "user_id": me.get("user_id"),
+            "manager_name": me["manager_name"],
+            "manager_email": me.get("manager_email", ""),
+            "team_name": me["team_name"],
+            "team_id": me.get("team_id"),
+            "role": me.get("role", "manager"),
+            "allowed_team_ids": me.get("allowed_team_ids", []),
+        }
+        st.session_state.update(session_data)
+        _save_session(session_data)
+        return True
+    st.error("Authentication failed. Please try again.")
+    return False
+
+
+# Restore session from file if lost (happens on full page reload via <a> links)
+if not st.session_state.get("logged_in", False):
+    _saved = _load_session()
+    if _saved and _saved.get("logged_in"):
+        st.session_state.update(_saved)
+
+if not st.session_state.get("logged_in", False):
+    if _show_login_page():
+        with st.spinner("Authenticating via SSO..."):
+            _time_module.sleep(0.8)
+            if _do_login():
+                st.rerun()
+    st.stop()
+
+_mgr_name = st.session_state.get("manager_name", "Manager")
+_team_name = st.session_state.get("team_name", "Team")
 
 
 def _fmt(seconds: float) -> str:
@@ -501,6 +682,34 @@ with st.sidebar:
             f'<img src="data:image/png;base64,{_logo_b64}" style="height:80px;"></div>',
             unsafe_allow_html=True,
         )
+
+    _n_scope = len(st.session_state.get("allowed_team_ids", []))
+    _scope_label = f"{_n_scope} team{'s' if _n_scope != 1 else ''} in scope" if _n_scope else ""
+    _scope_html = (
+        f'<div style="font-size:0.7rem; color:var(--za-green); margin-top:4px; font-weight:600;">'
+        f'{_scope_label}</div>'
+    ) if _scope_label else ""
+
+    st.markdown(
+        f'<div style="padding:8px 0 4px; border-bottom: 1px solid var(--za-border); margin-bottom:12px;">'
+        f'<div style="font-size:0.7rem; color:var(--za-text-muted); text-transform:uppercase; '
+        f'letter-spacing:1px; font-weight:600;">Signed in as</div>'
+        f'<div style="font-size:0.95rem; font-weight:700; color:var(--za-text); margin-top:2px;">'
+        f'{_mgr_name}</div>'
+        f'<div style="font-size:0.78rem; color:var(--za-text-muted);">'
+        f'{st.session_state.get("role", "manager").title()} &middot; {_team_name}</div>'
+        f'{_scope_html}'
+        f'</div>',
+        unsafe_allow_html=True,
+    )
+
+    if st.button("Sign Out", use_container_width=True):
+        for k in ["logged_in", "user_id", "manager_name", "manager_email",
+                   "team_name", "team_id", "role", "allowed_team_ids"]:
+            st.session_state.pop(k, None)
+        _clear_session()
+        st.rerun()
+
     st.markdown("**Admin Settings**")
     auto_refresh = st.checkbox("Auto-refresh (10 s)", value=True)
 
@@ -520,6 +729,10 @@ if _delete_uid:
 # ── Header ───────────────────────────────────────────────────────────
 _now_str = datetime.now().strftime("%b %d, %Y &middot; %H:%M")
 _logo_tag = f'<img src="data:image/png;base64,{_logo_b64}" class="za-logo">' if _logo_b64 else ""
+
+_role_label = st.session_state.get("role", "manager").title()
+_mgr_initials = "".join(w[0] for w in _mgr_name.split() if w)[:2].upper()
+
 st.markdown(
     f"""<div class="za-header">
         {_logo_tag}
@@ -528,7 +741,22 @@ st.markdown(
             <div class="za-subtitle">Invisible Signals. Visible Performance.</div>
         </div>
         <div class="za-spacer"></div>
-        <div class="za-date">{_now_str}</div>
+        <div style="display:flex; align-items:center; gap:14px;">
+            <div style="text-align:right;">
+                <div style="font-size:0.82rem; font-weight:600; color:#f1f5f9;">{_mgr_name}</div>
+                <div style="font-size:0.65rem; color:#94a3b8; letter-spacing:0.5px;">
+                    {_role_label} &middot; {_team_name}
+                </div>
+            </div>
+            <div style="width:36px; height:36px; border-radius:50%;
+                        background:linear-gradient(135deg,#3b82f6,#6366f1);
+                        display:flex; align-items:center; justify-content:center;
+                        font-size:0.78rem; font-weight:700; color:#fff;
+                        letter-spacing:0.5px; flex-shrink:0;">
+                {_mgr_initials}
+            </div>
+        </div>
+        <div class="za-date" style="margin-left:14px;">{_now_str}</div>
     </div>""",
     unsafe_allow_html=True,
 )
@@ -699,7 +927,7 @@ if selected_user_id:
     st.markdown('</div>', unsafe_allow_html=True)  # close za-detail-section
 
     st.markdown(
-        '<div class="za-footer"><span>Admin view</span><span>Zinnia Axion v1.0</span></div>',
+        f'<div class="za-footer"><span>{_mgr_name} &middot; {_team_name}</span><span>Zinnia Axion v1.0</span></div>',
         unsafe_allow_html=True,
     )
     if auto_refresh:
@@ -735,7 +963,7 @@ _np_val = "red" if avg_non_prod >= 50 else ("amber" if avg_non_prod >= 40 else "
 st.markdown(f"""
 <div class="za-metrics">
     <div class="za-card card-neutral">
-        <div class="za-card-label">Team Size</div>
+        <div class="za-card-label">{_team_name} &mdash; Team Size</div>
         <div class="za-card-value">{total_users}</div>
     </div>
     <div class="za-card {_prod_cls}">
@@ -777,7 +1005,7 @@ else:
 
 # ── Leaderboard ──────────────────────────────────────────────────────
 st.markdown(
-    '<div class="za-section">Leaderboard &mdash; ranked by non-productive % (highest first)</div>',
+    f'<div class="za-section">{_team_name} Team Leaderboard &mdash; ranked by non-productive % (highest first)</div>',
     unsafe_allow_html=True,
 )
 
@@ -849,7 +1077,7 @@ st.markdown(
 # ── Footer ───────────────────────────────────────────────────────────
 st.markdown(
     f"""<div class="za-footer">
-        <span>Auto-refresh {'enabled' if auto_refresh else 'paused'} &middot; Admin view</span>
+        <span>Auto-refresh {'enabled' if auto_refresh else 'paused'} &middot; {_mgr_name} &middot; {_team_name}</span>
         <span>Zinnia Axion v1.0</span>
     </div>""",
     unsafe_allow_html=True,

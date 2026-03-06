@@ -6,7 +6,6 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Load .env from project root
 _env_path = Path(__file__).resolve().parent.parent / ".env"
 load_dotenv(_env_path)
 
@@ -22,61 +21,41 @@ class Config:
 
     # ── Productivity thresholds (tuned for 10-second buckets) ───
     BUCKET_SIZE_SEC: int = int(os.getenv("BUCKET_SIZE_SEC", "10"))
-
-    # Combined interaction threshold (keystrokes + clicks)
-    # Scaled from 10 (at 60s) → 2 (at 10s)
     PRODUCTIVE_INTERACTION_THRESHOLD: int = int(
         os.getenv("PRODUCTIVE_INTERACTION_THRESHOLD", "2")
     )
-    # Keystroke-only threshold (if user is mostly typing)
-    # Scaled from 5 (at 60s) → 1 (at 10s)
     PRODUCTIVE_KEYSTROKE_THRESHOLD: int = int(
         os.getenv("PRODUCTIVE_KEYSTROKE_THRESHOLD", "1")
     )
-    # Mouse-only threshold (if user is mostly clicking — design tools, etc.)
-    # Scaled from 3 (at 60s) → 1 (at 10s)
     PRODUCTIVE_MOUSE_THRESHOLD: int = int(
         os.getenv("PRODUCTIVE_MOUSE_THRESHOLD", "1")
     )
 
     # ── Reading / Active Presence detection (tuned for 10s buckets) ──
-    # Minimum mouse movement (pixels) to infer physical presence (reading/scrolling)
-    # Scaled from 50px (at 60s) → 8px (at 10s)
     MOUSE_MOVEMENT_THRESHOLD: float = float(
         os.getenv("MOUSE_MOVEMENT_THRESHOLD", "8")
     )
-    # OS idle seconds beyond which the user is assumed away from the computer
     IDLE_AWAY_THRESHOLD: float = float(
         os.getenv("IDLE_AWAY_THRESHOLD", "30")
     )
-    # Anti-wiggle: minimum 1-second samples with mouse movement in a bucket
-    # to count as sustained presence (real reading vs occasional nudge)
-    # Scaled from 15 (at 60s) → 3 (at 10s)
     MOUSE_MOVEMENT_MIN_SAMPLES: int = int(
         os.getenv("MOUSE_MOVEMENT_MIN_SAMPLES", "3")
     )
 
     # ── Anti-cheat: Interaction variance (tuned for 10s buckets) ──
-    # Minimum fraction of samples with zero interaction (natural pauses)
     MIN_ZERO_SAMPLE_RATIO: float = float(
         os.getenv("MIN_ZERO_SAMPLE_RATIO", "0.25")
     )
-    # Minimum distinct per-sample interaction values (real typing = many, bot = 1-2)
-    # Reduced from 3 to 2 for 10s buckets (fewer samples = fewer possible distinct values)
     MIN_DISTINCT_VALUES: int = int(
         os.getenv("MIN_DISTINCT_VALUES", "2")
     )
 
     # ── Multi-monitor / Split-screen / PiP distraction ─────────
-    # Fraction of bucket samples with a visible distraction needed to
-    # block the "active presence" (reading) productivity pathway
     DISTRACTION_MIN_RATIO: float = float(
         os.getenv("DISTRACTION_MIN_RATIO", "0.3")
     )
 
     # ── Meeting apps (always productive) ────────────────────────
-    # Apps that are considered productive even with zero interaction
-    # (you're talking in a meeting, not typing)
     MEETING_APPS: list[str] = [
         s.strip().lower()
         for s in os.getenv(
@@ -87,17 +66,12 @@ class Config:
     ]
 
     # ── Data Retention ────────────────────────────────────────────
-    # Days of raw events to keep; older events are purged on startup
-    # 0 = disabled (keep forever)
     DATA_RETENTION_DAYS: int = int(os.getenv("DATA_RETENTION_DAYS", "14"))
 
     # ── Timezone ──────────────────────────────────────────────────
-    # Local timezone for day boundary calculations
-    # "today" starts at midnight in THIS timezone, not UTC
     TIMEZONE: str = os.getenv("TIMEZONE", "UTC")
 
     # ── Browser apps (website-level breakdown) ──────────────────
-    # Window titles of these apps are parsed to extract the website/service name
     BROWSER_APPS: list[str] = [
         s.strip().lower()
         for s in os.getenv(
@@ -108,7 +82,6 @@ class Config:
     ]
 
     # ── App classification ──────────────────────────────────────
-    # Apps that are ALWAYS non-productive regardless of interaction
     NON_PRODUCTIVE_APPS: list[str] = [
         s.strip().lower()
         for s in os.getenv(
@@ -119,26 +92,49 @@ class Config:
     ]
 
     # ── Data Minimization ──────────────────────────────────────
-    # Server-side enforcement: discard all window titles before storage
-    # Even if a tracker sends titles, the backend replaces them with ""
     DROP_TITLES: bool = os.getenv("DROP_TITLES", "false").lower() in ("true", "1", "yes")
 
     # ── Rate Limiting & Input Validation ────────────────────────
-    # Max request body size in kilobytes (rejects with HTTP 413 if exceeded)
     MAX_REQUEST_SIZE_KB: int = int(os.getenv("MAX_REQUEST_SIZE_KB", "512"))
-
-    # Per-device (or per-IP in demo mode) rate limit for POST /track
-    # Format: "<count>/minute" — requests beyond this get HTTP 429
     RATE_LIMIT_PER_DEVICE: str = os.getenv("RATE_LIMIT_PER_DEVICE", "120/minute")
+    RATE_LIMIT_ADMIN_LOGIN: str = os.getenv("RATE_LIMIT_ADMIN_LOGIN", "5/minute")
+    RATE_LIMIT_ADMIN_MUTATION: str = os.getenv("RATE_LIMIT_ADMIN_MUTATION", "30/minute")
 
     # ── Enterprise Hardening ─────────────────────────────────────
-    # Master toggle: True = relaxed (no auth, open dashboards)
-    #                False = enforce device auth, RBAC, rate limits, etc.
     DEMO_MODE: bool = os.getenv("DEMO_MODE", "true").lower() in ("true", "1", "yes")
-
-    # Flask session signing key (required in production)
     SECRET_KEY: str = os.getenv("SECRET_KEY", "")
 
-    # Admin credentials (required in production)
+    # Legacy admin credentials (kept for backward compat; OIDC is primary in production)
     ADMIN_USERNAME: str = os.getenv("ADMIN_USERNAME", "admin")
     ADMIN_PASSWORD: str = os.getenv("ADMIN_PASSWORD", "")
+
+    # ── OIDC SSO Configuration ───────────────────────────────────
+    OIDC_ISSUER_URL: str = os.getenv("OIDC_ISSUER_URL", "")
+    OIDC_CLIENT_ID: str = os.getenv("OIDC_CLIENT_ID", "")
+    OIDC_CLIENT_SECRET: str = os.getenv("OIDC_CLIENT_SECRET", "")
+    OIDC_REDIRECT_URI: str = os.getenv("OIDC_REDIRECT_URI", "http://localhost:5000/admin/callback")
+    OIDC_SCOPES: str = os.getenv("OIDC_SCOPES", "openid profile email")
+
+    # ── Break-glass admin login (emergency only) ─────────────────
+    ADMIN_BREAK_GLASS: bool = os.getenv("ADMIN_BREAK_GLASS", "false").lower() in ("true", "1", "yes")
+    ADMIN_BREAK_GLASS_IPS: list[str] = [
+        s.strip()
+        for s in os.getenv("ADMIN_BREAK_GLASS_IPS", "127.0.0.1").split(",")
+        if s.strip()
+    ]
+
+    # ── CORS ─────────────────────────────────────────────────────
+    CORS_ALLOWED_ORIGINS: list[str] = [
+        s.strip()
+        for s in os.getenv(
+            "CORS_ALLOWED_ORIGINS",
+            "http://localhost:8501,http://localhost:8502",
+        ).split(",")
+        if s.strip()
+    ]
+
+    # ── Session ──────────────────────────────────────────────────
+    SESSION_COOKIE_SECURE: bool = os.getenv("SESSION_COOKIE_SECURE", "false").lower() in ("true", "1", "yes")
+    SESSION_COOKIE_HTTPONLY: bool = True
+    SESSION_COOKIE_SAMESITE: str = os.getenv("SESSION_COOKIE_SAMESITE", "Lax")
+    PERMANENT_SESSION_LIFETIME_MINUTES: int = int(os.getenv("PERMANENT_SESSION_LIFETIME_MINUTES", "30"))

@@ -10,6 +10,7 @@ venv/
 
 # Environment
 .env
+.admin_session.json
 
 # Database
 *.db

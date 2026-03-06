@@ -53,6 +53,10 @@ BUFFER_FILE: Path = Path(os.getenv("BUFFER_FILE", str(_project_root / "tracker" 
 WAKE_THRESHOLD: float = float(os.getenv("WAKE_THRESHOLD_SEC", "30"))
 USER_ID: str = os.getenv("USER_ID", "default")
 
+# ── Enterprise: Device token auth ─────────────────────────────────
+TRACKER_DEVICE_TOKEN: str = os.getenv("TRACKER_DEVICE_TOKEN", "")
+LAN_ID: str = os.getenv("LAN_ID", "") or os.getenv("USERNAME", "") or os.getenv("USER", "") or USER_ID
+
 # ── Ghost / system apps to ignore during Power Nap or lock screen ────
 # Samples from these apps with zero interaction are silently dropped.
 GHOST_APPS: set[str] = {
@@ -232,10 +236,15 @@ def _send_batch(events: list[dict]) -> bool:
     if not events:
         return True
     try:
+        headers = {"ngrok-skip-browser-warning": "1"}
+        if TRACKER_DEVICE_TOKEN:
+            headers["Authorization"] = f"Bearer {TRACKER_DEVICE_TOKEN}"
+            headers["X-LAN-ID"] = LAN_ID
+
         resp = requests.post(
             f"{BACKEND_URL}/track",
             json={"events": events},
-            headers={"ngrok-skip-browser-warning": "1"},
+            headers=headers,
             timeout=5,
         )
         if resp.status_code == 201:
