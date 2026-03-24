@@ -1,0 +1,102 @@
+# ============================================================
+# Zinnia Axion - Git Attributes (Enterprise)
+# ============================================================
+
+# ─── Line Endings ────────────────────────────────────────────
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Python files
+*.py text eol=lf
+*.pyi text eol=lf
+
+# Shell scripts
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Windows batch files
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Config files
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.toml text eol=lf
+*.ini text eol=lf
+*.cfg text eol=lf
+.env* text eol=lf
+
+# Documentation
+*.md text eol=lf
+*.txt text eol=lf
+*.rst text eol=lf
+LICENSE text eol=lf
+
+# Web files
+*.html text eol=lf
+*.css text eol=lf
+*.js text eol=lf
+*.jsx text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+
+# SQL
+*.sql text eol=lf
+
+# ─── Binary Files ────────────────────────────────────────────
+# Explicitly mark as binary (never modify)
+*.db binary
+*.sqlite binary
+*.sqlite3 binary
+*.pkl binary
+*.pickle binary
+*.pyc binary
+*.pyo binary
+*.pyd binary
+*.so binary
+*.dll binary
+*.exe binary
+*.msi binary
+*.msix binary
+*.dmg binary
+*.pkg binary
+*.app binary
+*.zip binary
+*.tar binary
+*.gz binary
+*.tgz binary
+*.rar binary
+*.7z binary
+*.iso binary
+
+# Images
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg text
+*.webp binary
+
+# Fonts
+*.ttf binary
+*.otf binary
+*.woff binary
+*.woff2 binary
+*.eot binary
+
+# ─── Security & Diff ─────────────────────────────────────────
+# Prevent diff on sensitive files
+.env* diff=secret
+*.pem diff=secret
+*.key diff=secret
+*.crt diff=secret
+
+# Custom diff for Python
+*.py diff=python
+
+# ─── Merge Strategy ──────────────────────────────────────────
+# Keep ours for auto-generated files during merge
+migrations/versions/*.py merge=ours

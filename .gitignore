@@ -1,38 +1,200 @@
-# Python
+# ============================================================
+# Zinnia Axion - Enterprise .gitignore
+# ============================================================
+
+# ─── Sensitive Data (NEVER COMMIT) ───────────────────────────
+.env
+.env.local
+.env.production
+.env.staging
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+credentials.json
+secrets.json
+service-account.json
+.admin_session.json
+.user_session.json
+
+# ─── Python ──────────────────────────────────────────────────
 __pycache__/
 *.py[cod]
+*$py.class
+*.so
+.Python
 *.egg-info/
 dist/
 build/
+*.egg
+.eggs/
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover
+.hypothesis/
+
+# ─── Virtual Environments ────────────────────────────────────
 .venv/
 venv/
-*.egg
+ENV/
+env/
+.virtualenv/
+*.virtualenv
 
-# Environment
-.env
-.admin_session.json
-
-# Database
+# ─── Database ────────────────────────────────────────────────
 *.db
+*.sqlite
+*.sqlite3
+*.db-journal
 instance/
+migrations/versions/*.pyc
+pgdata/
+postgres-data/
 
-# Tracker buffer
+# ─── Application Data ────────────────────────────────────────
 tracker/buffer.json
+buffer.json
+*.buffer
+telemetry-data/
+user-data/
+backup/
+exports/
 
-# IDE
+# ─── Logs ────────────────────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log.*
+.telemetry-tracker/*.log
+
+# ─── IDE & Editors ───────────────────────────────────────────
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
+.project
+.classpath
+.settings/
+*.sublime-project
+*.sublime-workspace
+.vscode-test/
+.cursor/
 
-# PyInstaller
-*.spec
-
-# Logs
-logs/
-*.log
-
-# OS
+# ─── OS Generated Files ──────────────────────────────────────
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ─── Build & Distribution ────────────────────────────────────
+dist/
+build/
+*.spec
+installer/mac/dist/
+installer/mac/build/
+installer/windows/dist/
+installer/windows/build/
+*.dmg
+*.pkg
+*.msi
+*.exe
+*.app
+
+# ─── Testing ─────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+test-results/
+test-reports/
+
+# ─── Documentation ───────────────────────────────────────────
+docs/_build/
+site/
+.mkdocs/
+
+# ─── Cloud & Deployment ──────────────────────────────────────
+.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
+terraform.tfvars
+.aws/
+.gcp/
+.azure/
+
+# ─── Docker ──────────────────────────────────────────────────
+docker-compose.override.yml
+.docker/
+*.tar
+*.tar.gz
+
+# ─── Node.js (if frontend uses npm) ──────────────────────────
+node_modules/
+package-lock.json
+yarn.lock
+.npm/
+.yarn/
+.pnp.*
+
+# ─── Temporary Files ─────────────────────────────────────────
+*.tmp
+*.temp
+*.bak
+*.cache
+.cache/
+tmp/
+temp/
+
+# ─── macOS Installer Build ───────────────────────────────────
+.telemetry-tracker/
+*.dmg
+*.pkg
+
+# ─── Windows Installer Build ─────────────────────────────────
+*.msi
+*.msix
+
+# ─── Session & Auth Files ────────────────────────────────────
+flask_session/
+session/
+.session
+
+# ─── Local Config Overrides ──────────────────────────────────
+config.local.py
+local_settings.py
+
+# ─── Jupyter Notebooks ───────────────────────────────────────
+.ipynb_checkpoints/
+*.ipynb
+
+# ─── Backup Files ────────────────────────────────────────────
+*.backup
+*.old
+*.orig
+*~
+
+# ============================================================
+# Keep These Files (Exceptions)
+# ============================================================
+!.env.example
+!.gitkeep
+!requirements.txt
+!README.md
