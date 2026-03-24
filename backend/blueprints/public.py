@@ -51,6 +51,30 @@ def _run_cleanup(config) -> int:
     return count
 
 
+def _bucketize_per_user(events, cfg):
+    """Bucketize events per-user, then merge all buckets.
+
+    When events span multiple users, mixing them into a single stream
+    inflates per-bucket activity metrics (keystrokes, mouse, etc.) and
+    corrupts the confidence score.  This helper groups by user_id first,
+    bucketizes each user independently, then returns the combined list.
+    """
+    if not events:
+        return []
+    user_ids = {e.user_id for e in events}
+    if len(user_ids) <= 1:
+        return bucketize(events, cfg)
+
+    by_user: dict[str, list] = defaultdict(list)
+    for e in events:
+        by_user[e.user_id].append(e)
+
+    all_buckets = []
+    for uid_events in by_user.values():
+        all_buckets.extend(bucketize(uid_events, cfg))
+    return all_buckets
+
+
 @public_bp.route("/summary/today", methods=["GET"])
 def summary_today():
     """Productivity state totals for today (or ?date=YYYY-MM-DD)."""
@@ -58,7 +82,7 @@ def summary_today():
     user_id = request.args.get("user_id")
     start, end = resolve_range(cfg)
     events = base_query(start, end, user_id).all()
-    buckets = bucketize(events, cfg)
+    buckets = _bucketize_per_user(events, cfg)
     summary = summarize_buckets(buckets)
     return jsonify(summary), 200
 
@@ -70,7 +94,7 @@ def apps():
     user_id = request.args.get("user_id")
     start, end = resolve_range(cfg)
     events = base_query(start, end, user_id).all()
-    buckets = bucketize(events, cfg)
+    buckets = _bucketize_per_user(events, cfg)
     breakdown = app_breakdown(buckets, cfg)
     return jsonify(breakdown), 200
 
@@ -93,7 +117,7 @@ def daily():
         d = today - timedelta(days=offset)
         start, end = day_range(d, cfg)
         events = base_query(start, end, user_id).all()
-        buckets = bucketize(events, cfg)
+        buckets = _bucketize_per_user(events, cfg)
         summary = summarize_buckets(buckets)
         summary["date"] = d.isoformat()
         series.append(summary)

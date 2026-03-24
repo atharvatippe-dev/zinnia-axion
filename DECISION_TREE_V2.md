@@ -109,8 +109,8 @@ final_confidence = max(0.0, min(final_confidence, 1.0))
 | Scenario | Density | Presence | Coverage | Idle Pen | Modifiers | Final | Meaning |
 |----------|---------|----------|----------|----------|-----------|-------|---------|
 | Deep coding in VS Code | 0.95 | 0.80 | 1.00 | 0.95 | none | **0.93** | Clearly productive |
-| Reading docs, no typing | 0.05 | 0.90 | 1.00 | 0.90 | none | **0.55** | Present but low interaction — passes 0.55 threshold |
-| Coding with Slack on 2nd monitor | 0.90 | 0.75 | 1.00 | 0.90 | ×0.70 distraction | **0.63** | Productive but distracted — still passes 0.55 |
+| Reading docs, no typing | 0.05 | 0.90 | 1.00 | 0.90 | none | **0.55** | Present but low interaction — below 0.60 threshold |
+| Coding with Slack on 2nd monitor | 0.90 | 0.75 | 1.00 | 0.90 | ×0.70 distraction | **0.63** | Productive but distracted — still passes 0.60 |
 | Coding with YouTube on 2nd monitor | 0.90 | 0.75 | 1.00 | 0.90 | ×0.70 distraction | **0.63** | Same score, but Rule 2 may also apply |
 | VS Code open, user walked away | 0.00 | 0.10 | 1.00 | 0.10 | none | **0.29** | App is productive but nobody is there |
 | Zoom call, user listening | 0.02 | 0.30 | 1.00 | 0.70 | none | **0.39** | Low score — but Rule 1 always overrides to productive |
@@ -228,13 +228,13 @@ RULE 3: ANTI-CHEAT (BOT DETECTION)
 ▼
 RULE 4: CONFIDENCE THRESHOLD
 │
-│  Condition: final_confidence ≥ 0.55
+│  Condition: final_confidence ≥ 0.60
 │
 │  This is the main classification gate. If the bucket passed
 │  Rules 1-3 without being overridden, the confidence score
 │  makes the final call.
 │
-│  A confidence of 0.55+ means some meaningful combination of:
+│  A confidence of 0.60+ means some meaningful combination of:
 │    - User was typing/clicking (density)
 │    - User was physically present (presence via mouse movement)
 │    - Tracker data is complete (coverage)
@@ -243,7 +243,7 @@ RULE 4: CONFIDENCE THRESHOLD
 │    - No non-productive apps consuming time
 │    - No bot-like patterns
 │
-│  The threshold is set at 0.55 (not higher) to give fair
+│  The threshold is set at 0.60 to give fair
 │  credit to reading-heavy work patterns (code review, docs,
 │  PR review) where density is low but presence and coverage
 │  are high — these are legitimate productive activities.
@@ -256,16 +256,16 @@ RULE 4: CONFIDENCE THRESHOLD
 │
 │   EXAMPLES THAT PASS:
 │   - Coding in VS Code with steady typing (density ~0.9, conf ~0.85)
-│   - Coding with Slack on second monitor (conf ~0.63, above 0.55)
+│   - Coding with Slack on second monitor (conf ~0.63, above 0.60)
 │   - Reviewing a PR with scrolling, occasional clicks (density ~0.3,
 │     presence ~0.8, conf ~0.62)
 │   - Reading docs, no typing, mouse scrolling (density ~0.05,
-│     presence ~0.9, coverage 1.0, idle_pen ~0.9, conf ~0.55)
+│     presence ~0.9, coverage 1.0, idle_pen ~0.9, conf ~0.55 — now below threshold)
 │   - Writing in Google Docs with some mouse usage (conf ~0.70)
 │
 │   EXAMPLES THAT FAIL:
 │   - VS Code open but user on phone (density 0, presence 0.1, conf ~0.29)
-│   - Reading docs with YouTube on second monitor (conf drops below 0.55
+│   - Reading docs with YouTube on second monitor (conf drops below 0.60
 │     after distraction penalty)
 │   - Laptop awake but user in kitchen (idle 50s, conf ~0.15)
 │
@@ -275,7 +275,7 @@ RULE 4: CONFIDENCE THRESHOLD
 ▼
 RULE 5: FALLTHROUGH — INSUFFICIENT ACTIVITY
 │
-│  Condition: final_confidence < 0.55
+│  Condition: final_confidence < 0.60
 │
 │  → STATE: NON_PRODUCTIVE
 │    confidence: final_confidence
@@ -331,7 +331,7 @@ Every classified bucket writes one record:
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `BUCKET_SIZE_SEC` | `60` | Bucket window size in seconds |
-| `CONFIDENCE_THRESHOLD` | `0.55` | Minimum confidence to classify as productive |
+| `CONFIDENCE_THRESHOLD` | `0.60` | Minimum confidence to classify as productive |
 | `INTERACTION_THRESHOLD_60S` | `12` | Keystrokes + clicks needed for density = 1.0 (scaled 6× from 10s value of 2) |
 | `KEYSTROKE_THRESHOLD_60S` | `6` | Keystrokes alone for density = 1.0 (scaled 6× from 10s value of 1) |
 | `MOUSE_THRESHOLD_60S` | `6` | Clicks alone for density = 1.0 (scaled 6× from 10s value of 1) |
@@ -359,7 +359,7 @@ Every classified bucket writes one record:
 | Zoom left open after call ended | PRODUCTIVE (Zoom = meeting app) | PRODUCTIVE (Rule 1 — meetings always productive) | Same |
 | Auto-clicker on VS Code | PRODUCTIVE or NON-PRODUCTIVE (binary anti-cheat) | NON-PRODUCTIVE (conf 0.27 — anti-cheat multiplier crushes score) | v2 |
 | 40s YouTube + 20s VS Code in same minute | Two separate buckets: 4 non-prod + 2 prod | One bucket: NON-PRODUCTIVE (non_prod_ratio 0.67 ≥ 0.6667, Rule 2) | Same |
-| Reading code, no typing, mouse scrolling | Depends on mouse threshold (binary pass/fail) | Productive if presence + coverage + idle are good enough (conf ~0.55, passes threshold) | v2 |
+| Reading code, no typing, mouse scrolling | Depends on mouse threshold (binary pass/fail) | Productive if presence + coverage + idle are good enough (conf ~0.55, may not pass 0.60 threshold) | v2 |
 | Reading code with YouTube on 2nd monitor | NON-PRODUCTIVE (distraction blocks Rule 4 entirely) | Confidence penalized by ×0.70 — might still pass or fail depending on other signals | v2 (fairer) |
 | 5s YouTube glance during 55s of coding | 1 bucket flips to non-prod (if snapshot lands on YouTube) | PRODUCTIVE (non_prod_ratio 0.08 → minor penalty, conf still ~0.80) | v2 |
 | Employee disputes productivity score | "System says non-productive" — no detail | "Bucket confidence was 0.52 — borderline due to 30% idle and some Slack" — auditable | v2 |

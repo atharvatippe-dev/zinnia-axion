@@ -164,7 +164,7 @@ def _fmt(seconds: int) -> str:
 with st.sidebar:
     st.markdown("**Settings**")
     trend_days = st.slider("Trend days", 1, 30, 7)
-    auto_refresh = st.checkbox("Auto-refresh (30 s)")
+    auto_refresh = st.checkbox("Auto-refresh (60 s)")
 
 # ── Read user_id from URL query params (set by admin dashboard link) ─
 _qp = st.query_params
@@ -312,5 +312,5 @@ st.markdown(
 # ── Auto-refresh ────────────────────────────────────────────────────
 if auto_refresh:
     import time as _time
-    _time.sleep(30)
+    _time.sleep(60)
     st.rerun()

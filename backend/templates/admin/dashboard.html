@@ -34,9 +34,11 @@
 <!-- Metrics -->
 {% if leaderboard %}
 {% set total_users = leaderboard | length %}
-{% set avg_prod = (leaderboard | map(attribute='productive_pct') | sum) / total_users if total_users else 0 %}
-{% set avg_np = (leaderboard | map(attribute='non_productive_pct') | sum) / total_users if total_users else 0 %}
 {% set total_sec = leaderboard | map(attribute='total_sec') | sum %}
+{% set total_prod_sec = leaderboard | map(attribute='productive_sec') | sum %}
+{% set total_np_sec = leaderboard | map(attribute='non_productive_sec') | sum %}
+{% set avg_prod = (total_prod_sec / total_sec * 100) | round(1) if total_sec else 0 %}
+{% set avg_np = (total_np_sec / total_sec * 100) | round(1) if total_sec else 0 %}
 
 <div class="metrics">
     <div class="card metric-card">

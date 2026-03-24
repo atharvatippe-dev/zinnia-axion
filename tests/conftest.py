@@ -27,6 +27,8 @@ os.environ["DEMO_MODE"] = "false"
 os.environ["DATABASE_URI"] = "sqlite://"
 os.environ["SECRET_KEY"] = "test-secret-key-not-for-production"
 os.environ["OIDC_ISSUER_URL"] = ""
+os.environ["LOG_TO_FILE"] = "false"  # Disable file logging during tests
+os.environ["LOG_LEVEL"] = "WARNING"  # Reduce log noise during tests
 
 from backend.app import create_app
 from backend.config import Config

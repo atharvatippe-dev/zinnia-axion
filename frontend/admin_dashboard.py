@@ -543,6 +543,7 @@ def _show_login_page():
             "Wasim Shaikh (Lifecad)": "demo_manager",
             "Atharva Tippe (Axion)": "atharva_mgr",
             "Nikhil Saxena (Engineering)": "nikhil",
+            "Punit Joshi (Fast)": "punit",
         }
         _selected = st.selectbox(
             "Sign in as", list(_managers.keys()), index=0, key="sso_manager_pick",
@@ -711,20 +712,30 @@ with st.sidebar:
         st.rerun()
 
     st.markdown("**Admin Settings**")
-    auto_refresh = st.checkbox("Auto-refresh (10 s)", value=True)
+    auto_refresh = st.checkbox("Auto-refresh (60 s)", value=True)
 
 # ── Query params ─────────────────────────────────────────────────────
 _qp = st.query_params
 selected_user_id = _qp.get("user_id", None)
 _delete_uid = _qp.get("delete_user", None)
+_qp_date = _qp.get("date", None)
 
-if _delete_uid:
-    result = _delete(f"/admin/user/{_delete_uid}")
-    if result:
-        st.success(f"Deleted {result.get('deleted', 0)} events for **{_delete_uid}**.")
-    st.query_params.clear()
-    _time_module.sleep(1.5)
-    st.rerun()
+if _delete_uid and not st.session_state.get("_del_confirmed"):
+    st.warning(f"Are you sure you want to delete **all telemetry data** for **{_delete_uid}**? This cannot be undone.")
+    _col_yes, _col_no, _ = st.columns([1, 1, 4])
+    with _col_yes:
+        if st.button("Yes, delete", type="primary", key="confirm_del"):
+            _delete(f"/admin/user/{_delete_uid}")
+            st.session_state["_del_confirmed"] = True
+            st.query_params.clear()
+            st.rerun()
+    with _col_no:
+        if st.button("Cancel", key="cancel_del"):
+            st.query_params.clear()
+            st.rerun()
+    st.stop()
+elif st.session_state.get("_del_confirmed"):
+    st.session_state.pop("_del_confirmed", None)
 
 # ── Header ───────────────────────────────────────────────────────────
 _now_str = datetime.now().strftime("%b %d, %Y &middot; %H:%M")
@@ -778,15 +789,22 @@ for _offset in range(5):
 _date_labels = [opt[0] for opt in _date_options]
 _date_values = [opt[1] for opt in _date_options]
 
-_fc1, _fc2 = st.columns([3, 1])
-with _fc2:
-    _sel_idx = st.selectbox(
-        "Filter Date",
-        range(len(_date_labels)),
-        format_func=lambda i: _date_labels[i],
-        index=0,
-        key="date_filter",
-    )
+_default_date_idx = 0
+if _qp_date and _qp_date in _date_values:
+    _default_date_idx = _date_values.index(_qp_date)
+
+if selected_user_id:
+    _sel_idx = _default_date_idx
+else:
+    _fc1, _fc2 = st.columns([3, 1])
+    with _fc2:
+        _sel_idx = st.selectbox(
+            "Filter Date",
+            range(len(_date_labels)),
+            format_func=lambda i: _date_labels[i],
+            index=_default_date_idx,
+            key="date_filter",
+        )
 _selected_date: str = _date_values[_sel_idx]
 _is_today = _sel_idx == 0
 _date_param: dict = {} if _is_today else {"date": _selected_date}
@@ -803,12 +821,15 @@ if not _is_today:
 #  PAGE 2 — User Detail
 # =====================================================================
 if selected_user_id:
+    _back_href = f"?date={_selected_date}" if not _is_today else "?"
     st.markdown(
-        '<a href="?" target="_self" class="za-back">&larr; Back to Leaderboard</a>',
+        f'<a href="{_back_href}" target="_self" class="za-back">&larr; Back to Leaderboard</a>',
         unsafe_allow_html=True,
     )
+    _detail_date_label = _date_labels[_sel_idx]
     st.markdown(
         f'<div class="za-detail-title">User Detail &mdash; {selected_user_id}</div>'
+        f'<div style="font-size:0.78rem;color:#94a3b8;margin:-8px 0 12px 0;">Showing: <strong>{_detail_date_label}</strong></div>'
         f'<div class="za-detail-section">',
         unsafe_allow_html=True,
     )
@@ -931,7 +952,7 @@ if selected_user_id:
         unsafe_allow_html=True,
     )
     if auto_refresh:
-        _time_module.sleep(10)
+        _time_module.sleep(60)
         st.rerun()
     st.stop()
 
@@ -951,9 +972,11 @@ if not leaderboard or len(leaderboard) == 0:
 
 # ── Metric cards ─────────────────────────────────────────────────────
 total_users = len(leaderboard)
-avg_prod = sum(r["productive_pct"] for r in leaderboard) / total_users if total_users else 0
-avg_non_prod = sum(r["non_productive_pct"] for r in leaderboard) / total_users if total_users else 0
 total_tracked = sum(r["total_sec"] for r in leaderboard)
+total_prod_sec = sum(r["productive_sec"] for r in leaderboard)
+total_non_prod_sec = sum(r["non_productive_sec"] for r in leaderboard)
+avg_prod = round(total_prod_sec / total_tracked * 100, 1) if total_tracked else 0
+avg_non_prod = round(total_non_prod_sec / total_tracked * 100, 1) if total_tracked else 0
 
 _prod_cls = "card-green"
 _prod_val = "green"
@@ -1062,9 +1085,8 @@ for entry in leaderboard:
         f"<td>{_fmt(entry['productive_sec'])}</td>"
         f"<td>{_fmt(entry['total_sec'])}</td>"
         f'<td style="white-space:nowrap; text-align:right;">'
-        f'<a href="?user_id={uid}" target="_self" class="action-link action-view">View</a> '
-        f'<a href="?delete_user={uid}" target="_self" class="action-link action-delete"'
-        f' onclick="return confirm(\'Delete all data for {uid}?\');">Delete</a>'
+        f'<a href="?user_id={uid}&date={_selected_date}" target="_self" class="action-link action-view">View</a> '
+        f'<a href="?delete_user={uid}" target="_self" class="action-link action-delete">Delete</a>'
         f"</td></tr>"
     )
 
@@ -1085,5 +1107,5 @@ st.markdown(
 
 # ── Auto-refresh ─────────────────────────────────────────────────────
 if auto_refresh and not st.session_state.get("_summary_open", False):
-    _time_module.sleep(10)
+    _time_module.sleep(60)
     st.rerun()

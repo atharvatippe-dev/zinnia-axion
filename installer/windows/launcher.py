@@ -1,12 +1,16 @@
 """
 Launcher - entry point for the bundled Zinnia Axion .exe (Windows).
 
-Flow:
+Flow (Fully Automatic - No User Prompts):
   1. Check if %USERPROFILE%\\.telemetry-tracker\\config.env exists
-  2. If not → show setup GUI (first launch)
-  3. Load config.env into environment
-  4. Install Task Scheduler auto-start entry (idempotent)
-  5. Start the Zinnia Axion Agent
+  2. If not → auto-detect LAN ID from Windows USERNAME (first launch)
+  3. Create config.env automatically with detected LAN ID
+  4. Load config.env into environment
+  5. Install Task Scheduler auto-start entry (idempotent)
+  6. Start the Zinnia Axion Agent
+
+The tracker automatically uses the employee's Windows login username (LAN ID)
+without requiring any user input. Perfect for silent enterprise deployment.
 """
 
 from __future__ import annotations
@@ -64,28 +68,34 @@ def _install_autostart() -> None:
 
 
 def main() -> None:
-    # Step 1: First-launch setup if needed
+    # Step 1: Auto-create config on first launch (no GUI prompt)
     if not CONFIG_FILE.exists() or CONFIG_FILE.stat().st_size == 0:
-        logger.info("No config found - launching setup GUI.")
-        from installer.windows.setup_gui import show_setup
-
-        setup_done = False
-
-        def on_complete():
-            nonlocal setup_done
-            setup_done = True
-
-        show_setup(on_complete=on_complete)
-
-        if not setup_done:
-            logger.info("Setup cancelled by user.")
-            sys.exit(0)
+        logger.info("No config found - auto-detecting LAN ID from Windows login.")
+        
+        # Auto-detect LAN ID from Windows USERNAME environment variable
+        auto_lan_id = os.getenv("USERNAME") or os.getenv("USER") or "default"
+        logger.info(f"Auto-detected LAN ID: {auto_lan_id}")
+        
+        # Create config automatically (no user prompt needed)
+        from installer.windows.setup_gui import write_config
+        try:
+            from installer.windows.build_config import BACKEND_URL as DEFAULT_BACKEND_URL
+        except ImportError:
+            DEFAULT_BACKEND_URL = os.environ.get(
+                "INSTALLER_BACKEND_URL", "https://your-backend-url.ngrok-free.dev"
+            )
+        
+        write_config(auto_lan_id, DEFAULT_BACKEND_URL)
+        logger.info(f"Config auto-created with LAN ID: {auto_lan_id}")
 
     # Step 2: Load config
     _load_config_env()
     logger.info("Config loaded. User ID: %s", os.environ.get("USER_ID", "unknown"))
 
-    # Step 3: Start the tracker
+    # Step 3: Install auto-start (idempotent - safe to call multiple times)
+    _install_autostart()
+
+    # Step 4: Start the tracker
     from tracker.agent import main as tracker_main
     tracker_main()
 

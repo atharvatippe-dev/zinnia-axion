@@ -4,7 +4,7 @@ Factory that returns the correct PlatformCollector for the current OS.
 
 from __future__ import annotations
 
-import platform
+import sys
 import logging
 
 from tracker.platform.base import PlatformCollector
@@ -18,14 +18,14 @@ def get_collector() -> PlatformCollector:
 
     Raises RuntimeError if the platform is unsupported.
     """
-    system = platform.system().lower()
+    system = sys.platform
 
     if system == "darwin":
         from tracker.platform.macos import MacOSCollector
         logger.info("Detected macOS — using MacOSCollector.")
         return MacOSCollector()
 
-    elif system == "windows":
+    elif system == "win32":
         from tracker.platform.windows import WindowsCollector
         logger.info("Detected Windows — using WindowsCollector.")
         return WindowsCollector()

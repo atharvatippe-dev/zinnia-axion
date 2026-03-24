@@ -1,0 +1,53 @@
+name: Build Windows MSI
+
+on:
+  workflow_dispatch:
+    inputs:
+      backend_url:
+        description: 'Backend URL'
+        required: true
+        default: 'https://your-backend-url.com'
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-msi:
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install cx_Freeze
+          pip install -r requirements.txt
+          pip install pywin32 psutil pynput
+      
+      - name: Build MSI
+        env:
+          INSTALLER_BACKEND_URL: ${{ github.event.inputs.backend_url || 'https://axion.company.com' }}
+        run: |
+          python setup_msi.py bdist_msi
+      
+      - name: Upload MSI artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ZinniaAxion-MSI
+          path: dist/*.msi
+          retention-days: 30
+      
+      - name: Create Release (on tag)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/*.msi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

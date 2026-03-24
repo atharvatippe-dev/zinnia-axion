@@ -262,6 +262,19 @@ def _send_batch(events: list[dict]) -> bool:
 # ── Main loop ───────────────────────────────────────────────────────
 
 def main() -> None:
+    # Set up centralized logging first
+    # Import here to avoid circular dependencies
+    try:
+        # Try to use backend's centralized logging config
+        from backend.logging_config import setup_logging
+        setup_logging()
+    except ImportError:
+        # Fallback: simple logging config if backend not available
+        logging.basicConfig(
+            level=logging.INFO,
+            format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+        )
+
     logger.info("Starting Zinnia Axion Agent.")
     logger.info("  User ID       : %s", USER_ID)
     logger.info("  Backend URL   : %s", BACKEND_URL)
@@ -273,11 +286,18 @@ def main() -> None:
     collector = get_collector()
     collector.start_input_listener()
 
-    # Flush any buffered events from a previous crash
+    # Flush any buffered events from a previous crash (in chunks to avoid 413)
     stale = _load_and_clear_buffer()
     if stale:
-        if not _send_batch(stale):
-            _save_buffer(stale)
+        _FLUSH_CHUNK = 100
+        unsent: list[dict] = []
+        for i in range(0, len(stale), _FLUSH_CHUNK):
+            chunk = stale[i : i + _FLUSH_CHUNK]
+            if not _send_batch(chunk):
+                unsent.extend(stale[i:])
+                break
+        if unsent:
+            _save_buffer(unsent)
 
     batch: list[dict] = []
     last_flush = time.monotonic()

@@ -1,0 +1,18 @@
+# Windows MSI Installer Build Dependencies
+# Install these on your build machine (not needed on employee machines)
+
+# MSI builder (pure Python, no external tools needed)
+cx_Freeze>=6.15
+
+# Alternative: PyInstaller + WiX approach
+# pyinstaller>=6.0
+# (Also requires WiX Toolset: https://wixtoolset.org/)
+
+# Platform-specific tracker dependencies (Windows)
+psutil>=5.9
+pywin32>=306
+pynput>=1.7
+
+# Core tracker dependencies
+requests>=2.31
+python-dotenv>=1.0

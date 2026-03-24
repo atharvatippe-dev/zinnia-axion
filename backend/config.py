@@ -19,41 +19,96 @@ class Config:
     SQLALCHEMY_DATABASE_URI: str = os.getenv("DATABASE_URI", "sqlite:///telemetry.db")
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
 
-    # ── Productivity thresholds (tuned for 10-second buckets) ───
-    BUCKET_SIZE_SEC: int = int(os.getenv("BUCKET_SIZE_SEC", "10"))
+    # ── Logging ─────────────────────────────────────────────────
+    # Centralized logging configuration (see backend/logging_config.py)
+    LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
+    LOG_FILE: str = os.getenv("LOG_FILE", "logs/app.log")
+    LOG_TO_FILE: bool = os.getenv("LOG_TO_FILE", "true").lower() in ("true", "1", "yes")
+    LOG_MAX_BYTES: int = int(os.getenv("LOG_MAX_BYTES", str(10 * 1024 * 1024)))  # 10 MB
+    LOG_BACKUP_COUNT: int = int(os.getenv("LOG_BACKUP_COUNT", "5"))
+
+    # ── Productivity thresholds (scaled for 60-second buckets / 60 samples) ──
+    BUCKET_SIZE_SEC: int = int(os.getenv("BUCKET_SIZE_SEC", "60"))
     PRODUCTIVE_INTERACTION_THRESHOLD: int = int(
-        os.getenv("PRODUCTIVE_INTERACTION_THRESHOLD", "2")
+        os.getenv("PRODUCTIVE_INTERACTION_THRESHOLD", "12")
     )
     PRODUCTIVE_KEYSTROKE_THRESHOLD: int = int(
-        os.getenv("PRODUCTIVE_KEYSTROKE_THRESHOLD", "1")
+        os.getenv("PRODUCTIVE_KEYSTROKE_THRESHOLD", "6")
     )
     PRODUCTIVE_MOUSE_THRESHOLD: int = int(
-        os.getenv("PRODUCTIVE_MOUSE_THRESHOLD", "1")
+        os.getenv("PRODUCTIVE_MOUSE_THRESHOLD", "6")
     )
 
-    # ── Reading / Active Presence detection (tuned for 10s buckets) ──
+    # ── Confidence threshold (v2 decision tree) ──────────────────
+    CONFIDENCE_THRESHOLD: float = float(
+        os.getenv("CONFIDENCE_THRESHOLD", "0.60")
+    )
+
+    # ── Reading / Active Presence detection (scaled for 60s buckets) ──
     MOUSE_MOVEMENT_THRESHOLD: float = float(
-        os.getenv("MOUSE_MOVEMENT_THRESHOLD", "8")
+        os.getenv("MOUSE_MOVEMENT_THRESHOLD", "48")
     )
     IDLE_AWAY_THRESHOLD: float = float(
         os.getenv("IDLE_AWAY_THRESHOLD", "30")
     )
+    # With 10s polling: 3 out of 6 samples should have mouse movement
     MOUSE_MOVEMENT_MIN_SAMPLES: int = int(
         os.getenv("MOUSE_MOVEMENT_MIN_SAMPLES", "3")
     )
 
-    # ── Anti-cheat: Interaction variance (tuned for 10s buckets) ──
+    # ── Anti-cheat: Interaction variance (scaled for 60s buckets) ──
     MIN_ZERO_SAMPLE_RATIO: float = float(
         os.getenv("MIN_ZERO_SAMPLE_RATIO", "0.25")
     )
     MIN_DISTINCT_VALUES: int = int(
-        os.getenv("MIN_DISTINCT_VALUES", "2")
+        os.getenv("MIN_DISTINCT_VALUES", "3")
     )
 
     # ── Multi-monitor / Split-screen / PiP distraction ─────────
     DISTRACTION_MIN_RATIO: float = float(
         os.getenv("DISTRACTION_MIN_RATIO", "0.3")
     )
+
+    # ── Decision tree v2: rule thresholds ─────────────────────────
+    PRODUCTIVE_DOMINANT_RATIO: float = float(
+        os.getenv("PRODUCTIVE_DOMINANT_RATIO", "0.70")
+    )
+    NON_PROD_DOMINANT_RATIO: float = float(
+        os.getenv("NON_PROD_DOMINANT_RATIO", "0.6667")
+    )
+    MEETING_DOMINANT_RATIO: float = float(
+        os.getenv("MEETING_DOMINANT_RATIO", "0.50")
+    )
+    DISTRACTION_CONFIDENCE_MULT: float = float(
+        os.getenv("DISTRACTION_CONFIDENCE_MULT", "0.70")
+    )
+    NON_PROD_MIX_WEIGHT: float = float(
+        os.getenv("NON_PROD_MIX_WEIGHT", "0.50")
+    )
+    ANTI_CHEAT_CONFIDENCE_MULT: float = float(
+        os.getenv("ANTI_CHEAT_CONFIDENCE_MULT", "0.30")
+    )
+
+    # ── App classification ───────────────────────────────────────
+    # Productive apps (if dominant ≥70%, bucket classified as productive)
+    PRODUCTIVE_APPS: list[str] = [
+        s.strip().lower()
+        for s in os.getenv(
+            "PRODUCTIVE_APPS",
+            "visual studio code,vscode,pycharm,intellij,android studio,xcode,sublime text,atom,vim,emacs,cursor,figma,sketch,adobe photoshop,adobe illustrator,blender,unity,unreal engine,docker,postman,tableau,excel,word,powerpoint,outlook,notion,obsidian,roam research,jira,confluence,linear,asana,trello,monday.com",
+        ).split(",")
+        if s.strip()
+    ]
+
+    # Non-productive apps (if dominant ≥66.67%, bucket classified as non-productive)
+    NON_PRODUCTIVE_APPS: list[str] = [
+        s.strip().lower()
+        for s in os.getenv(
+            "NON_PRODUCTIVE_APPS",
+            "youtube,netflix,reddit,twitter,x.com,instagram,facebook,tiktok,twitch,discord,spotify,steam,epic games,league of legends,fortnite,valorant,minecraft,roblox",
+        ).split(",")
+        if s.strip()
+    ]
 
     # ── Meeting apps (always productive) ────────────────────────
     MEETING_APPS: list[str] = [
@@ -77,16 +132,6 @@ class Config:
         for s in os.getenv(
             "BROWSER_APPS",
             "safari,google chrome,chrome,firefox,microsoft edge,msedge,brave browser,brave,arc,chromium,opera",
-        ).split(",")
-        if s.strip()
-    ]
-
-    # ── App classification ──────────────────────────────────────
-    NON_PRODUCTIVE_APPS: list[str] = [
-        s.strip().lower()
-        for s in os.getenv(
-            "NON_PRODUCTIVE_APPS",
-            "youtube,netflix,reddit,twitter,x.com,instagram,facebook,tiktok,twitch,discord,spotify,steam,epic games",
         ).split(",")
         if s.strip()
     ]
@@ -134,7 +179,11 @@ class Config:
     ]
 
     # ── Session ──────────────────────────────────────────────────
-    SESSION_COOKIE_SECURE: bool = os.getenv("SESSION_COOKIE_SECURE", "false").lower() in ("true", "1", "yes")
+    # Defaults to True in production (DEMO_MODE=false), False in demo mode
+    SESSION_COOKIE_SECURE: bool = os.getenv(
+        "SESSION_COOKIE_SECURE",
+        "false" if os.getenv("DEMO_MODE", "true").lower() in ("true", "1", "yes") else "true",
+    ).lower() in ("true", "1", "yes")
     SESSION_COOKIE_HTTPONLY: bool = True
     SESSION_COOKIE_SAMESITE: str = os.getenv("SESSION_COOKIE_SAMESITE", "Lax")
     PERMANENT_SESSION_LIFETIME_MINUTES: int = int(os.getenv("PERMANENT_SESSION_LIFETIME_MINUTES", "30"))

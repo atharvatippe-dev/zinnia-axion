@@ -38,11 +38,9 @@ from flask_wtf.csrf import CSRFProtect
 from backend.config import Config
 from backend.models import db, TelemetryEvent
 from backend.audit import log_action
+from backend.logging_config import setup_logging, log_startup_info
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-)
+# Note: Logging is configured via setup_logging() in create_app()
 logger = logging.getLogger("backend")
 
 
@@ -87,8 +85,9 @@ def _seed_demo_hierarchy(database):
     """Seed a 3-level team hierarchy for demo mode.
 
     Engineering (Nikhil — VP)
-      └── Lifecad (Wasim — Manager)
-            └── Axion (Atharva — Lead)
+      ├── Lifecad (Wasim — Manager)
+      │     └── Axion (Atharva — Lead)
+      └── Fast (Punit Joshi — Manager)
 
     Wasim is the default login manager; he sees Lifecad + Axion.
     """
@@ -140,6 +139,7 @@ def _seed_demo_hierarchy(database):
     team_n = _ensure_team("Engineering")
     team_w = _ensure_team("Lifecad", parent=team_n)
     team_a = _ensure_team("Axion", parent=team_w)
+    team_f = _ensure_team("Fast", parent=team_n)
 
     nikhil = _ensure_user("nikhil", "nikhil@company.local", "Nikhil Saxena", "manager")
     wasim_mgr = _ensure_user("demo_manager", "wasim@company.local", "Wasim Shaikh", "manager")
@@ -153,16 +153,22 @@ def _seed_demo_hierarchy(database):
     _ensure_membership(wasim_mgr, team_w)
     _ensure_membership(atharva_mgr, team_a)
 
+    punit_mgr = _ensure_user("punit", "punit@company.local", "Punit Joshi", "manager")
+    _ensure_manager(punit_mgr, team_f)
+    _ensure_membership(punit_mgr, team_f)
+
     # Tracked users — lan_id must match the USER_ID the tracker agent sends
     atharva_user = _ensure_user("Atharva", "atharva.user@company.local", "Atharva", "user")
     wasim_user = _ensure_user("Wasim", "wasim.user@company.local", "Wasim", "user")
+    kumarlu_user = _ensure_user("kumarlu", "kumarlu@company.local", "Kumarlu", "user")
     _ensure_membership(atharva_user, team_a)
     _ensure_membership(wasim_user, team_w)
+    _ensure_membership(kumarlu_user, team_f)
 
     database.session.commit()
     logger.info(
-        "Demo seed: hierarchy ready — Engineering(%s) > Lifecad(%s) > Axion(%s)",
-        team_n.id, team_w.id, team_a.id,
+        "Demo seed: hierarchy ready — Engineering(%s) > Lifecad(%s) > Axion(%s), Fast(%s)",
+        team_n.id, team_w.id, team_a.id, team_f.id,
     )
 
 
@@ -172,6 +178,10 @@ def create_app(config: Config | None = None) -> Flask:
 
     if config is None:
         config = Config()
+
+    # ── Centralized Logging Setup ───────────────────────────────
+    # Must be called early before any logging occurs
+    setup_logging(app)
 
     # ── Demo / Production mode gate ─────────────────────────────
     if config.DEMO_MODE:
@@ -354,6 +364,9 @@ def create_app(config: Config | None = None) -> Flask:
         # Auto-cleanup old events on startup
         from backend.blueprints.public import _run_cleanup
         _run_cleanup(config)
+
+    # ── Log startup information ─────────────────────────────────
+    log_startup_info(app)
 
     return app
 
