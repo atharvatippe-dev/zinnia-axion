@@ -2,10 +2,10 @@
 SAML 2.0 SSO routes for admin authentication.
 
 Routes:
-  GET  /admin/saml/metadata  — Service Provider metadata (for IdP registration)
-  POST /admin/saml/acs       — Assertion Consumer Service (handles SAML login)
-  GET  /admin/saml/slo       — Single Logout (handles SAML logout)
-  GET  /admin/saml/login     — Initiate SAML login
+  GET  /saml/metadata  — Service Provider metadata (for IdP registration)
+  GET  /saml/login     — Initiate SAML login (redirect to Azure AD)
+  POST /saml/acs       — Assertion Consumer Service (handle SAML response)
+  GET  /saml/slo       — Single Logout (handle SAML logout)
 """
 
 from __future__ import annotations
@@ -18,8 +18,8 @@ from flask import (
 
 from backend.models import db, User, Team, Manager
 from backend.auth.saml import (
-    init_saml_auth, get_sp_settings, validate_saml_response,
-    extract_user_info_from_saml, generate_saml_metadata,
+    create_authn_request, parse_saml_response,
+    extract_user_from_saml, generate_saml_metadata,
 )
 from backend.audit import log_action
 from backend.auth.team_hierarchy import get_allowed_team_ids
@@ -29,7 +29,7 @@ logger = logging.getLogger("backend.blueprints.saml_routes")
 saml_bp = Blueprint("saml", __name__, url_prefix="/saml")
 
 
-# ── SAML Metadata ────────────────────────────────────────────────────
+# ── SAML Metadata ────────────────────────────────────────────────────────
 
 
 @saml_bp.route("/metadata", methods=["GET"])
@@ -37,7 +37,7 @@ def saml_metadata():
     """
     Return Service Provider (SP) SAML metadata.
     
-    This is used by the IdP admin to register this application.
+    This is used by the IdP admin to register this application in Azure AD.
     No authentication required.
     """
     cfg = current_app.config
@@ -53,44 +53,46 @@ def saml_metadata():
         return jsonify({"error": "Failed to generate metadata"}), 500
 
 
-# ── SAML Login Flow ──────────────────────────────────────────────────
+# ── SAML Login Flow ──────────────────────────────────────────────────────
 
 
 @saml_bp.route("/login", methods=["GET"])
 def saml_login():
     """
-    Initiate SAML login by redirecting to IdP.
+    Initiate SAML login by redirecting to Azure AD.
     """
     cfg = current_app.config
     
     if not cfg.get("SAML_ENABLED"):
         return jsonify({"error": "SAML not enabled"}), 503
     
-    if not cfg.SAML_IDP_METADATA_XML:
-        logger.error("SAML IdP metadata not configured")
-        return jsonify({"error": "SAML not properly configured"}), 500
-    
     try:
-        sp_settings = get_sp_settings(cfg)
-        auth = init_saml_auth(cfg, request, sp_settings)
+        sp_entity_id = cfg.get("SAML_SP_ENTITY_ID")
+        acs_url = cfg.get("SAML_SP_ACS_URL")
+        idp_sso_url = cfg.get("SAML_IDP_SSO_URL")
         
-        # Generate SAML AuthnRequest and redirect to IdP
-        sso_url = auth.login()
-        logger.info(f"Redirecting to IdP SSO: {sso_url}")
+        if not all([sp_entity_id, acs_url, idp_sso_url]):
+            logger.error("SAML configuration incomplete")
+            return jsonify({"error": "SAML not properly configured"}), 500
         
-        return redirect(sso_url)
+        # Create AuthnRequest and get redirect URL
+        redirect_url = create_authn_request(sp_entity_id, acs_url, idp_sso_url)
+        
+        logger.info(f"Redirecting to Azure AD for SAML login")
+        return redirect(redirect_url)
+        
     except Exception as e:
         logger.error(f"Error initiating SAML login: {e}", exc_info=True)
         return jsonify({"error": "SAML login initiation failed"}), 500
 
 
-# ── SAML Assertion Consumer Service (ACS) ──────────────────────────
+# ── SAML Assertion Consumer Service (ACS) ────────────────────────────────
 
 
 @saml_bp.route("/acs", methods=["POST"])
 def saml_acs():
     """
-    Handle SAML assertion from IdP (Assertion Consumer Service).
+    Handle SAML assertion from Azure AD (Assertion Consumer Service).
     
     Validates the SAML response, extracts user attributes,
     creates/updates user record, and establishes session.
@@ -100,27 +102,32 @@ def saml_acs():
     if not cfg.get("SAML_ENABLED"):
         return jsonify({"error": "SAML not enabled"}), 503
     
-    if not cfg.SAML_IDP_METADATA_XML:
-        logger.error("SAML IdP metadata not configured")
-        return jsonify({"error": "SAML not properly configured"}), 500
-    
     try:
-        sp_settings = get_sp_settings(cfg)
-        auth = init_saml_auth(cfg, request, sp_settings)
+        # Get SAML response from POST
+        saml_response = request.form.get('SAMLResponse')
+        relay_state = request.form.get('RelayState', '/')
         
-        # Validate SAML response
-        is_valid, errors, attributes = validate_saml_response(auth, cfg)
-        
-        if not is_valid:
-            logger.warning(f"SAML validation failed: {errors}")
-            log_action("anonymous", "saml_login_failed", detail=f"SAML validation error: {errors}")
+        if not saml_response:
+            logger.warning("No SAMLResponse in POST data")
             return render_template(
                 "admin/login.html",
-                error="SAML authentication failed. Please try again."
+                error="Invalid SAML response received"
+            ), 400
+        
+        logger.info("Received SAML response from Azure AD")
+        
+        # Parse SAML response
+        attributes = parse_saml_response(saml_response)
+        
+        if not attributes:
+            logger.warning("Failed to parse SAML response")
+            return render_template(
+                "admin/login.html",
+                error="Failed to parse SAML response. Please try again."
             ), 401
         
         # Extract user information
-        user_info = extract_user_info_from_saml(attributes)
+        user_info = extract_user_from_saml(attributes)
         email = user_info.get("email")
         
         if not email:
@@ -164,65 +171,52 @@ def saml_acs():
             log_action(user.lan_id, "saml_login_non_manager", detail="SAML user not authorized as manager")
             return render_template(
                 "admin/login.html",
-                error="User is not authorized as a manager. Please contact your administrator."
+                error="Your account is not authorized as a manager. Please contact your administrator."
             ), 403
         
         # Create session
-        session["user_id"] = user.id
-        session["team_id"] = manager.team_id
-        session["role"] = user.role
-        session["display_name"] = user.display_name
+        session['_login_lan_id'] = user.lan_id
+        session['_login_user_id'] = user.id
+        session['_login_team_ids'] = get_allowed_team_ids(user.id)
         session.permanent = True
         
-        logger.info(f"SAML session created for {user.lan_id} in team {manager.team_id}")
-        log_action(user.lan_id, "saml_login_success", detail=f"SAML login successful, team={manager.team_id}")
+        logger.info(f"SAML login successful for manager: {user.lan_id}")
+        log_action(user.lan_id, "saml_login_success", detail=f"Manager {user.lan_id} logged in via SAML")
         
         # Redirect to admin dashboard
-        return redirect(url_for("admin.admin_dashboard"))
+        return redirect(relay_state or url_for('admin.dashboard'))
         
     except Exception as e:
-        logger.error(f"SAML ACS processing failed: {e}", exc_info=True)
-        log_action("anonymous", "saml_acs_error", detail=f"SAML ACS error: {str(e)}")
+        logger.error(f"Error processing SAML ACS: {e}", exc_info=True)
         return render_template(
             "admin/login.html",
-            error="An error occurred during authentication. Please try again."
+            error="An error occurred during login. Please try again."
         ), 500
 
 
-# ── SAML Single Logout (SLO) ────────────────────────────────────────
+# ── SAML Single Logout (SLO) ────────────────────────────────────────────
 
 
 @saml_bp.route("/slo", methods=["GET", "POST"])
 def saml_slo():
     """
-    Handle SAML Single Logout (SLO) from IdP.
+    Handle SAML Single Logout (SLO).
     
-    Clears the user session and optionally redirects to IdP logout URL.
+    Clears local session and optionally redirects to IdP logout.
     """
     cfg = current_app.config
     
-    if not cfg.get("SAML_ENABLED"):
-        return jsonify({"error": "SAML not enabled"}), 503
-    
-    if not cfg.SAML_IDP_METADATA_XML:
-        logger.error("SAML IdP metadata not configured")
-        return jsonify({"error": "SAML not properly configured"}), 500
-    
     try:
-        user_id = session.get("user_id")
-        if user_id:
-            user = db.session.get(User, user_id)
-            log_action(user.lan_id if user else "unknown", "saml_logout", detail="SAML logout")
-        
         # Clear session
+        user_lan_id = session.get('_login_lan_id', 'unknown')
         session.clear()
         
-        logger.info("SAML logout completed")
+        logger.info(f"SAML logout for user: {user_lan_id}")
+        log_action(user_lan_id, "saml_logout", detail="User logged out via SAML")
         
-        # Redirect to login page or home
-        return redirect(url_for("admin.admin_login"))
+        # Redirect to login page
+        return redirect(url_for('admin.login_page'))
         
     except Exception as e:
-        logger.error(f"SAML SLO processing failed: {e}", exc_info=True)
-        session.clear()
-        return redirect(url_for("admin.admin_login"))
+        logger.error(f"Error during SAML SLO: {e}", exc_info=True)
+        return redirect(url_for('admin.login_page'))
