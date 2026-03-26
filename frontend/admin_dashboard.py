@@ -480,7 +480,10 @@ def _delete(path: str):
 # ── SSO Login Gate ───────────────────────────────────────────────────
 
 def _show_login_page():
-    """Render a professional SSO login page. Returns True if user logs in."""
+    """Render a professional SSO login page with SAML redirect."""
+    # Check if SAML is enabled
+    saml_enabled = os.getenv("SAML_ENABLED", "false").lower() in ("true", "1", "yes")
+    
     st.markdown("""
     <style>
     .sso-container {
@@ -539,22 +542,41 @@ def _show_login_page():
 
     col1, col2, col3 = st.columns([1.2, 2, 1.2])
     with col2:
-        _managers = {
-            "Wasim Shaikh (Lifecad)": "demo_manager",
-            "Atharva Tippe (Axion)": "atharva_mgr",
-            "Nikhil Saxena (Engineering)": "nikhil",
-            "Punit Joshi (Fast)": "punit",
-        }
-        _selected = st.selectbox(
-            "Sign in as", list(_managers.keys()), index=0, key="sso_manager_pick",
-        )
-        clicked = st.button("Sign in with SSO", type="primary", use_container_width=True)
-        if clicked:
-            st.session_state["_login_lan_id"] = _managers[_selected]
+        # If SAML is enabled, redirect to SAML login
+        if saml_enabled:
+            saml_login_url = f"{API_BASE}/saml/login"
+            st.markdown(f"""
+            <a href="{saml_login_url}" style="text-decoration: none;">
+                <button style="
+                    width: 100%; padding: 10px 16px; border: none;
+                    background-color: #1e40af; color: white;
+                    border-radius: 6px; font-weight: 600; cursor: pointer;
+                    font-size: 0.95rem;
+                ">
+                    Sign in with Azure AD
+                </button>
+            </a>
+            """, unsafe_allow_html=True)
+            st.info("You will be redirected to Azure AD for authentication.")
+        else:
+            # Demo mode: show manager selection
+            _managers = {
+                "Wasim Shaikh (Lifecad)": "demo_manager",
+                "Atharva Tippe (Axion)": "atharva_mgr",
+                "Nikhil Saxena (Engineering)": "nikhil",
+                "Punit Joshi (Fast)": "punit",
+            }
+            _selected = st.selectbox(
+                "Sign in as", list(_managers.keys()), index=0, key="sso_manager_pick",
+            )
+            clicked = st.button("Sign in with SSO", type="primary", use_container_width=True)
+            if clicked:
+                st.session_state["_login_lan_id"] = _managers[_selected]
+                return clicked
 
     st.markdown("""
             <div class="sso-footer">
-                Protected by OIDC / SAML Single Sign-On<br>
+                Protected by SAML 2.0 Single Sign-On<br>
                 Access is restricted to authorized managers only.
             </div>
             <div class="sso-badge">Enterprise SSO</div>
@@ -562,7 +584,7 @@ def _show_login_page():
     </div>
     """, unsafe_allow_html=True)
 
-    return clicked
+    return False
 
 
 _SESSION_FILE = _project_root / ".admin_session.json"

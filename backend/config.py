@@ -153,12 +153,33 @@ class Config:
     ADMIN_USERNAME: str = os.getenv("ADMIN_USERNAME", "admin")
     ADMIN_PASSWORD: str = os.getenv("ADMIN_PASSWORD", "")
 
-    # ── OIDC SSO Configuration ───────────────────────────────────
-    OIDC_ISSUER_URL: str = os.getenv("OIDC_ISSUER_URL", "")
-    OIDC_CLIENT_ID: str = os.getenv("OIDC_CLIENT_ID", "")
-    OIDC_CLIENT_SECRET: str = os.getenv("OIDC_CLIENT_SECRET", "")
-    OIDC_REDIRECT_URI: str = os.getenv("OIDC_REDIRECT_URI", "http://localhost:5000/admin/callback")
-    OIDC_SCOPES: str = os.getenv("OIDC_SCOPES", "openid profile email")
+    # ── SAML 2.0 SSO Configuration ───────────────────────────────────
+    # Service Provider (SP) Configuration
+    SAML_ENABLED: bool = os.getenv("SAML_ENABLED", "false").lower() in ("true", "1", "yes")
+    SAML_SP_ENTITY_ID: str = os.getenv(
+        "SAML_SP_ENTITY_ID",
+        "https://lcawsdev-lifecad-api.zinnia.com/saml/metadata"
+    )
+    SAML_SP_ACS_URL: str = os.getenv(
+        "SAML_SP_ACS_URL",
+        "https://lcawsdev-lifecad-api.zinnia.com/saml/acs"
+    )
+    SAML_SP_SLO_URL: str = os.getenv(
+        "SAML_SP_SLO_URL",
+        "https://lcawsdev-lifecad-api.zinnia.com/saml/slo"
+    )
+    
+    # Identity Provider (IdP) Configuration
+    SAML_IDP_ENTITY_ID: str = os.getenv("SAML_IDP_ENTITY_ID", "")
+    SAML_IDP_SSO_URL: str = os.getenv("SAML_IDP_SSO_URL", "")
+    SAML_IDP_SLO_URL: str = os.getenv("SAML_IDP_SLO_URL", "")
+    SAML_IDP_X509_CERT: str = os.getenv("SAML_IDP_X509_CERT", "")
+    SAML_IDP_METADATA_XML: str = os.getenv("SAML_IDP_METADATA_XML", "")
+    
+    # SAML Signing & Security
+    SAML_SIGNING_ENABLED: bool = os.getenv("SAML_SIGNING_ENABLED", "true").lower() in ("true", "1", "yes")
+    SAML_SIGNING_KEY: str = os.getenv("SAML_SIGNING_KEY", "")  # PEM-encoded private key
+    SAML_SIGNING_CERT: str = os.getenv("SAML_SIGNING_CERT", "")  # PEM-encoded certificate
 
     # ── Break-glass admin login (emergency only) ─────────────────
     ADMIN_BREAK_GLASS: bool = os.getenv("ADMIN_BREAK_GLASS", "false").lower() in ("true", "1", "yes")

@@ -256,6 +256,7 @@ def create_app(config: Config | None = None) -> Flask:
     # ── Blueprints ──────────────────────────────────────────────
     from backend.blueprints.admin import admin_bp
     from backend.blueprints.tracker import tracker_bp
+    from backend.blueprints.saml_routes import saml_bp
     from backend.blueprints.public import public_bp
 
     # Exempt all blueprints from CSRF — admin APIs are called from Streamlit
@@ -264,10 +265,12 @@ def create_app(config: Config | None = None) -> Flask:
     csrf.exempt(admin_bp)
     csrf.exempt(tracker_bp)
     csrf.exempt(public_bp)
+    csrf.exempt(saml_bp)
 
     app.register_blueprint(admin_bp)
     app.register_blueprint(tracker_bp)
     app.register_blueprint(public_bp)
+    app.register_blueprint(saml_bp)
 
     # Apply rate limits to specific endpoints
     limiter.limit(config.RATE_LIMIT_PER_DEVICE)(
