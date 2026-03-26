@@ -64,9 +64,12 @@ def create_authn_request(sp_entity_id, acs_url, idp_sso_url):
     <samlp:NameIDPolicy Format="urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress" AllowCreate="true"/>
 </samlp:AuthnRequest>'''
     
-    # Compress and encode
+    # Compress using DEFLATE (raw deflate, not zlib)
     import zlib
-    compressed = zlib.compress(authn_request.encode('utf-8'))
+    # Use wbits=-15 for raw DEFLATE (without zlib wrapper)
+    compressed = zlib.compress(authn_request.encode('utf-8'), wbits=-15)
+    
+    # Encode to base64
     encoded = base64.b64encode(compressed).decode('utf-8')
     
     # Build redirect URL
