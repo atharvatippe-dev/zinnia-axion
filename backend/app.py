@@ -39,6 +39,8 @@ from backend.config import Config
 from backend.models import db, TelemetryEvent
 from backend.audit import log_action
 from backend.logging_config import setup_logging, log_startup_info
+from backend.cache_config import get_redis_client, close_redis_client
+from backend.cloudwatch_metrics import get_cloudwatch_client
 
 # Note: Logging is configured via setup_logging() in create_app()
 logger = logging.getLogger("backend")
@@ -200,6 +202,25 @@ def create_app(config: Config | None = None) -> Flask:
     app.config.from_object(config)
     app.config["SECRET_KEY"] = config.SECRET_KEY or "dev-insecure-key-change-me"
     app.tracker_config = config  # type: ignore[attr-defined]
+
+    # ── SQLAlchemy Connection Pooling ────────────────
+    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = config.SQLALCHEMY_ENGINE_OPTIONS
+    
+    # ── Redis Cache Initialization ──────────────────
+    redis_client = get_redis_client()
+    if redis_client:
+        logger.info("Redis cache initialized successfully")
+        app.redis = redis_client  # type: ignore[attr-defined]
+    else:
+        logger.warning("Redis cache is disabled or unavailable")
+    
+    # ── CloudWatch Metrics Initialization ───────────
+    cw_client = get_cloudwatch_client()
+    if cw_client:
+        logger.info("CloudWatch metrics initialized")
+        app.cloudwatch = cw_client  # type: ignore[attr-defined]
+    else:
+        logger.warning("CloudWatch metrics are disabled or unavailable")
 
     # ── Request size limit ──────────────────────────────────────
     app.config["MAX_CONTENT_LENGTH"] = config.MAX_REQUEST_SIZE_KB * 1024
@@ -370,6 +391,12 @@ def create_app(config: Config | None = None) -> Flask:
 
     # ── Log startup information ─────────────────────────────────
     log_startup_info(app)
+
+    # ── Shutdown hooks ──────────────────────────────────────────
+    @app.teardown_appcontext
+    def shutdown_cache(exception=None):
+        """Close cache connections on shutdown."""
+        close_redis_client()
 
     return app
 

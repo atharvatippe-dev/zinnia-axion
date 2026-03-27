@@ -208,3 +208,31 @@ class Config:
     SESSION_COOKIE_HTTPONLY: bool = True
     SESSION_COOKIE_SAMESITE: str = os.getenv("SESSION_COOKIE_SAMESITE", "Lax")
     PERMANENT_SESSION_LIFETIME_MINUTES: int = int(os.getenv("PERMANENT_SESSION_LIFETIME_MINUTES", "30"))
+
+    # ── Redis Cache Configuration ────────────────────
+    CACHE_ENABLED: bool = os.getenv("CACHE_ENABLED", "true").lower() in ("true", "1", "yes")
+    REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+    REDIS_HOST: str = os.getenv("REDIS_HOST", "localhost")
+    REDIS_PORT: int = int(os.getenv("REDIS_PORT", "6379"))
+    REDIS_PASSWORD: str = os.getenv("REDIS_PASSWORD", "")
+    REDIS_DB: int = int(os.getenv("REDIS_DB", "0"))
+    # Cache TTL (Time-To-Live) in seconds
+    CACHE_TTL_USER_DATA: int = int(os.getenv("CACHE_TTL_USER_DATA", "300"))  # 5 min
+    CACHE_TTL_TEAM_HIERARCHY: int = int(os.getenv("CACHE_TTL_TEAM_HIERARCHY", "900"))  # 15 min
+    CACHE_TTL_DASHBOARD: int = int(os.getenv("CACHE_TTL_DASHBOARD", "60"))  # 1 min
+
+    # ── SQLAlchemy Connection Pooling ────────────────
+    SQLALCHEMY_ENGINE_OPTIONS: dict = {
+        "pool_size": int(os.getenv("DB_POOL_SIZE", "10")),
+        "pool_recycle": int(os.getenv("DB_POOL_RECYCLE", "3600")),
+        "pool_pre_ping": os.getenv("DB_POOL_PRE_PING", "true").lower() in ("true", "1", "yes"),
+        "max_overflow": int(os.getenv("DB_MAX_OVERFLOW", "20")),
+    }
+
+    # ── CloudWatch Metrics Integration ───────────────
+    CLOUDWATCH_ENABLED: bool = os.getenv("CLOUDWATCH_ENABLED", "true").lower() in ("true", "1", "yes")
+    AWS_REGION: str = os.getenv("AWS_REGION", "us-east-1")
+    AWS_ACCESS_KEY_ID: str = os.getenv("AWS_ACCESS_KEY_ID", "")
+    AWS_SECRET_ACCESS_KEY: str = os.getenv("AWS_SECRET_ACCESS_KEY", "")
+    CLOUDWATCH_NAMESPACE: str = os.getenv("CLOUDWATCH_NAMESPACE", "ZinniaAxion/Backend")
+    CLOUDWATCH_ENVIRONMENT: str = os.getenv("CLOUDWATCH_ENVIRONMENT", "development")

@@ -16,6 +16,11 @@ alembic>=1.13
 lxml>=4.9
 cryptography>=41.0
 
+# ─── Caching & Metrics ────────────────────────
+redis>=5.0
+flask-caching>=2.1
+boto3>=1.28
+
 # ─── Zinnia Axion Agent ────────────────────────
 requests>=2.31
 pynput>=1.7

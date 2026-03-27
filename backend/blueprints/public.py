@@ -22,6 +22,7 @@ from backend.models import db, TelemetryEvent
 from backend.audit import log_action
 from backend.productivity import bucketize, summarize_buckets, app_breakdown
 from backend.utils import get_config, resolve_range, base_query, today_range, day_range, get_local_tz
+from backend.monitoring import collect_and_report_metrics, get_pool_stats, get_cache_stats_dict
 
 logger = logging.getLogger("backend.blueprints.public")
 
@@ -175,3 +176,42 @@ def user_dashboard(user_id: str):
 @public_bp.route("/health", methods=["GET"])
 def health():
     return jsonify({"status": "ok"}), 200
+
+
+@public_bp.route("/metrics", methods=["GET"])
+def metrics():
+    """Get current database and cache metrics. Also reports to CloudWatch."""
+    try:
+        from flask import current_app
+        
+        # Collect and report metrics
+        collect_and_report_metrics(current_app)
+        
+        # Return current metrics to caller
+        pool_stats = get_pool_stats(current_app)
+        cache_stats = get_cache_stats_dict(current_app)
+        
+        return jsonify({
+            "timestamp": datetime.utcnow().isoformat(),
+            "database": pool_stats,
+            "cache": cache_stats,
+        }), 200
+    except Exception as e:
+        logger.error(f"Error retrieving metrics: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500
+
+
+@public_bp.route("/metrics/report", methods=["POST"])
+def metrics_report():
+    """Endpoint for external systems to trigger metrics collection."""
+    try:
+        from flask import current_app
+        
+        success = collect_and_report_metrics(current_app)
+        return jsonify({
+            "status": "success" if success else "error",
+            "timestamp": datetime.utcnow().isoformat(),
+        }), 200 if success else 500
+    except Exception as e:
+        logger.error(f"Error reporting metrics: {e}", exc_info=True)
+        return jsonify({"error": str(e)}), 500

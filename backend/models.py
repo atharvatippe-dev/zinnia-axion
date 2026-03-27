@@ -280,6 +280,11 @@ class TelemetryEvent(db.Model):
         db.Boolean, nullable=False, default=False, server_default=db.text("false"),
     )
 
+    __table_args__ = (
+        db.Index("ix_telemetry_user_timestamp", "user_id", "timestamp"),
+        db.Index("ix_telemetry_app_name", "app_name"),
+    )
+
     def to_dict(self) -> dict:
         return {
             "id": self.id,
@@ -323,7 +328,7 @@ class AuditLog(db.Model):
 
     # v2 fields for enterprise hardening
     actor_user_id: int = db.Column(
-        db.Integer, db.ForeignKey("users.id"), nullable=True
+        db.Integer, db.ForeignKey("users.id"), nullable=True, index=True
     )
     actor_team_id: int = db.Column(
         db.Integer, db.ForeignKey("teams.id"), nullable=True
@@ -333,6 +338,11 @@ class AuditLog(db.Model):
     )
     request_id: str = db.Column(db.String(64), nullable=True, index=True)
     extra_data: str = db.Column(db.Text, nullable=True)
+
+    __table_args__ = (
+        db.Index("ix_audit_log_actor_timestamp", "actor", "timestamp"),
+        db.Index("ix_audit_log_action_timestamp", "action", "timestamp"),
+    )
 
     def to_dict(self) -> dict:
         return {
