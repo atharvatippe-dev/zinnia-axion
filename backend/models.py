@@ -29,6 +29,7 @@ def _utcnow():
 
 class User(db.Model):
     __tablename__ = "users"
+    __table_args__ = {"schema": "zinnia"}
 
     id: int = db.Column(db.Integer, primary_key=True, autoincrement=True)
     lan_id: str = db.Column(db.String(128), unique=True, nullable=False, index=True)
@@ -71,6 +72,7 @@ class User(db.Model):
 
 class Team(db.Model):
     __tablename__ = "teams"
+    __table_args__ = {"schema": "zinnia"}
 
     id: int = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name: str = db.Column(db.String(128), unique=True, nullable=False)
@@ -102,6 +104,15 @@ class Team(db.Model):
 
 class Membership(db.Model):
     __tablename__ = "memberships"
+    __table_args__ = (
+        db.Index(
+            "ix_memberships_one_active_per_user",
+            "user_id",
+            unique=True,
+            postgresql_where=db.text("active = true"),
+        ),
+        {"schema": "zinnia"},
+    )
 
     id: int = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id: int = db.Column(
@@ -145,6 +156,7 @@ class Membership(db.Model):
 
 class Manager(db.Model):
     __tablename__ = "managers"
+    __table_args__ = {"schema": "zinnia"}
 
     user_id: int = db.Column(
         db.Integer, db.ForeignKey("users.id"), primary_key=True
@@ -162,6 +174,7 @@ class Manager(db.Model):
 
 class TrackerDeviceToken(db.Model):
     __tablename__ = "tracker_device_tokens"
+    __table_args__ = {"schema": "zinnia"}
 
     id: int = db.Column(db.Integer, primary_key=True, autoincrement=True)
     token_hash: str = db.Column(db.String(256), nullable=False, index=True)
@@ -208,6 +221,7 @@ class TrackerDeviceToken(db.Model):
 
 class TeamChangeRequest(db.Model):
     __tablename__ = "team_change_requests"
+    __table_args__ = {"schema": "zinnia"}
 
     id: int = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id: int = db.Column(
@@ -261,6 +275,11 @@ class TelemetryEvent(db.Model):
     """
 
     __tablename__ = "telemetry_events"
+    __table_args__ = (
+        db.Index("ix_telemetry_user_timestamp", "user_id", "timestamp"),
+        db.Index("ix_telemetry_app_name", "app_name"),
+        {"schema": "zinnia"},
+    )
 
     id: int = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id: str = db.Column(
@@ -314,6 +333,11 @@ class AuditLog(db.Model):
     """Immutable record of a security-relevant action."""
 
     __tablename__ = "audit_log"
+    __table_args__ = (
+        db.Index("ix_audit_log_actor_timestamp", "actor", "timestamp"),
+        db.Index("ix_audit_log_action_timestamp", "action", "timestamp"),
+        {"schema": "zinnia"},
+    )
 
     id: int = db.Column(db.Integer, primary_key=True, autoincrement=True)
     timestamp: datetime = db.Column(
