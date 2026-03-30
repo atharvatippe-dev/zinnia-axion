@@ -78,7 +78,7 @@ class Team(db.Model):
     name: str = db.Column(db.String(128), unique=True, nullable=False)
     parent_team_id: int | None = db.Column(
         db.Integer,
-        db.ForeignKey("teams.id"),
+        db.ForeignKey("zinnia.teams.id"),
         nullable=True,
         index=True,
     )
@@ -116,10 +116,10 @@ class Membership(db.Model):
 
     id: int = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id: int = db.Column(
-        db.Integer, db.ForeignKey("users.id"), nullable=False, index=True
+        db.Integer, db.ForeignKey("zinnia.users.id"), nullable=False, index=True
     )
     team_id: int = db.Column(
-        db.Integer, db.ForeignKey("teams.id"), nullable=False, index=True
+        db.Integer, db.ForeignKey("zinnia.teams.id"), nullable=False, index=True
     )
     active: bool = db.Column(
         db.Boolean, nullable=False, default=True, server_default=db.text("true")
@@ -159,10 +159,10 @@ class Manager(db.Model):
     __table_args__ = {"schema": "zinnia"}
 
     user_id: int = db.Column(
-        db.Integer, db.ForeignKey("users.id"), primary_key=True
+        db.Integer, db.ForeignKey("zinnia.users.id"), primary_key=True
     )
     team_id: int = db.Column(
-        db.Integer, db.ForeignKey("teams.id"), nullable=False, index=True
+        db.Integer, db.ForeignKey("zinnia.teams.id"), nullable=False, index=True
     )
 
     user = db.relationship("User", back_populates="manager_record")
@@ -179,10 +179,10 @@ class TrackerDeviceToken(db.Model):
     id: int = db.Column(db.Integer, primary_key=True, autoincrement=True)
     token_hash: str = db.Column(db.String(256), nullable=False, index=True)
     user_id: int = db.Column(
-        db.Integer, db.ForeignKey("users.id"), nullable=True
+        db.Integer, db.ForeignKey("zinnia.users.id"), nullable=True
     )
     team_id: int = db.Column(
-        db.Integer, db.ForeignKey("teams.id"), nullable=False
+        db.Integer, db.ForeignKey("zinnia.teams.id"), nullable=False
     )
     description: str = db.Column(db.String(256), nullable=True)
     expires_at: datetime = db.Column(db.DateTime, nullable=True)
@@ -191,7 +191,7 @@ class TrackerDeviceToken(db.Model):
     )
     created_at: datetime = db.Column(db.DateTime, nullable=False, default=_utcnow)
     rotated_from_id: int = db.Column(
-        db.Integer, db.ForeignKey("tracker_device_tokens.id"), nullable=True
+        db.Integer, db.ForeignKey("zinnia.tracker_device_tokens.id"), nullable=True
     )
 
     user = db.relationship("User", foreign_keys=[user_id])
@@ -225,19 +225,19 @@ class TeamChangeRequest(db.Model):
 
     id: int = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id: int = db.Column(
-        db.Integer, db.ForeignKey("users.id"), nullable=False, index=True
+        db.Integer, db.ForeignKey("zinnia.users.id"), nullable=False, index=True
     )
     from_team_id: int = db.Column(
-        db.Integer, db.ForeignKey("teams.id"), nullable=True
+        db.Integer, db.ForeignKey("zinnia.teams.id"), nullable=True
     )
     to_team_id: int = db.Column(
-        db.Integer, db.ForeignKey("teams.id"), nullable=False
+        db.Integer, db.ForeignKey("zinnia.teams.id"), nullable=False
     )
     requested_by: int = db.Column(
-        db.Integer, db.ForeignKey("users.id"), nullable=False
+        db.Integer, db.ForeignKey("zinnia.users.id"), nullable=False
     )
     approved_by: int = db.Column(
-        db.Integer, db.ForeignKey("users.id"), nullable=True
+        db.Integer, db.ForeignKey("zinnia.users.id"), nullable=True
     )
     status: str = db.Column(
         db.String(32), nullable=False, default="pending", server_default="pending"
@@ -352,13 +352,13 @@ class AuditLog(db.Model):
 
     # v2 fields for enterprise hardening
     actor_user_id: int = db.Column(
-        db.Integer, db.ForeignKey("users.id"), nullable=True, index=True
+        db.Integer, db.ForeignKey("zinnia.users.id"), nullable=True, index=True
     )
     actor_team_id: int = db.Column(
-        db.Integer, db.ForeignKey("teams.id"), nullable=True
+        db.Integer, db.ForeignKey("zinnia.teams.id"), nullable=True
     )
     target_team_id: int = db.Column(
-        db.Integer, db.ForeignKey("teams.id"), nullable=True
+        db.Integer, db.ForeignKey("zinnia.teams.id"), nullable=True
     )
     request_id: str = db.Column(db.String(64), nullable=True, index=True)
     extra_data: str = db.Column(db.Text, nullable=True)
