@@ -1,12 +1,12 @@
 """
-Build script - creates a Windows .exe using PyInstaller.
+Optional: standalone Windows .exe via PyInstaller (NOT the MSI pipeline).
 
-Usage (from project root):
-    set INSTALLER_BACKEND_URL=https://your-backend.ngrok-free.dev
-    python installer/windows/build.py
+Official installer: cx_Freeze MSI — run from repo root:
+    set INSTALLER_BACKEND_URL=https://your-backend.example.com
+    python setup_msi.py bdist_msi
+(Single source of truth: installer/windows/build_msi.py)
 
-Output:
-    dist/Zinnia_axion.exe
+This script only builds dist/Zinnia_axion.exe for ad-hoc testing or non-MSI distribution.
 """
 
 from __future__ import annotations
@@ -34,7 +34,9 @@ def main() -> None:
         config_file = PROJECT_ROOT / "installer" / "windows" / "build_config.py"
         config_file.write_text(
             '"""\nBuild-time configuration - values baked in by the build script.\n'
-            'Do NOT edit manually; this file is overwritten by build.py.\n"""\n\n'
+            "MSI builds: overwritten by installer/windows/build_msi.py via "
+            "INSTALLER_BACKEND_URL.\n"
+            'PyInstaller (this script): overwritten here.\n"""\n\n'
             f'BACKEND_URL = "{backend_url}"\n',
             encoding="utf-8",
         )

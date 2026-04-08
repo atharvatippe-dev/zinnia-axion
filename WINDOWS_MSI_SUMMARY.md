@@ -1,5 +1,9 @@
 # Windows MSI Installer - Implementation Complete ✅
 
+> **Canonical build (2026):** All cx_Freeze options live in **`installer/windows/build_msi.py`**.  
+> Run **`python setup_msi.py bdist_msi`** from the repo root (wrapper). See **`installer/windows/README_MSI.md`**.  
+> **`build_msi_simple.py`** is deprecated.
+
 ## What Was Created
 
 Successfully implemented a professional Windows MSI installer system for the Zinnia Axion tracker that allows one-click deployment to employees.
@@ -8,22 +12,18 @@ Successfully implemented a professional Windows MSI installer system for the Zin
 
 ## Files Created
 
-### 1. Main MSI Builder (Recommended)
-**`setup_msi.py`** (Root directory)
-- Pure Python MSI builder using cx_Freeze
-- No external tools required (no WiX needed)
-- Creates: `dist/ZinniaAxion-1.0.0-amd64.msi`
-- Size: 15-25 MB (includes Python runtime)
-
-### 2. Alternative Builders
+### 1. MSI builder (single path)
 **`installer/windows/build_msi.py`**
-- Advanced cx_Freeze build with more options
-- Same approach, more customizable
+- **Source of truth** for cx_Freeze (packages, MSI metadata, `ZinniaAxion.exe`, shortcuts, install dir, upgrade code).
+
+**`setup_msi.py`** (repo root)
+- Thin wrapper that calls `build_msi.main()` — use this for local and CI builds.
 
 **`installer/windows/build_msi_simple.py`**
-- PyInstaller + WiX Toolset approach
-- Smaller file size but requires WiX installation
-- For advanced users
+- **Deprecated** — prints instructions and exits (do not use).
+
+**`installer/windows/build.py`**
+- Optional PyInstaller `.exe` only; **not** used for MSI.
 
 ### 3. Documentation
 **`MSI_BUILD_QUICKSTART.md`**
@@ -60,10 +60,10 @@ python setup_msi.py bdist_msi
 
 ### For Employees (End Users):
 
-1. **Double-click** `ZinniaAxion.msi`
-2. **Install** via wizard (to `%LOCALAPPDATA%\Zinnia\Axion`)
-3. **Enter LAN ID** when prompted
-4. **Done!** Tracker starts automatically
+1. **Double-click** the MSI from `dist\`
+2. **Install** via wizard (default `%LOCALAPPDATA%\Zinnia\Axion`)
+3. **First run** creates `config.env` automatically (Windows username + baked backend URL); optional GUI via `setup_gui` module for manual fixes
+4. **Done** — tracker and Task Scheduler autostart install on launch
 
 ---
 
