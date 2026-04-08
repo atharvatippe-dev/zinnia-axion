@@ -1,9 +1,9 @@
 """
-Windows auto-start installer using Task Scheduler.
+Windows auto-start: Task Scheduler entry at user logon (schtasks).
 
-Creates a scheduled task that runs the tracker .exe at user logon.
-Uses schtasks.exe - no extra dependencies required.
-Idempotent - safe to call multiple times.
+Uses the frozen sys.executable (e.g. ZinniaAxion.exe from the MSI) so the task always
+matches the installed binary. Idempotent — deletes the same task name before create.
+Fallback: Startup folder batch file if schtasks fails.
 """
 
 from __future__ import annotations
@@ -84,7 +84,12 @@ def _install_startup_shortcut() -> None:
         logger.warning("Startup folder not found: %s", startup_dir)
         return
 
-    bat_path = startup_dir / "Zinnia_axion.bat"
+    legacy_bat = startup_dir / "Zinnia_axion.bat"
+    if legacy_bat.exists():
+        legacy_bat.unlink()
+        logger.info("Removed legacy startup launcher: %s", legacy_bat)
+
+    bat_path = startup_dir / "ZinniaAxion.bat"
     command = _get_command()
 
     bat_path.write_text(
@@ -110,10 +115,11 @@ def uninstall_autostart() -> None:
     startup_dir = Path(os.environ.get(
         "APPDATA", Path.home() / "AppData" / "Roaming"
     )) / "Microsoft" / "Windows" / "Start Menu" / "Programs" / "Startup"
-    bat_path = startup_dir / "Zinnia_axion.bat"
-    if bat_path.exists():
-        bat_path.unlink()
-        logger.info("Startup shortcut removed.")
+    for name in ("ZinniaAxion.bat", "Zinnia_axion.bat"):
+        bat_path = startup_dir / name
+        if bat_path.exists():
+            bat_path.unlink()
+            logger.info("Startup launcher removed: %s", bat_path)
 
 
 if __name__ == "__main__":

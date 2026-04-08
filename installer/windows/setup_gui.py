@@ -1,9 +1,10 @@
 """
-First-launch setup GUI for Zinnia Axion (Windows).
+Tkinter helpers for Zinnia Axion Windows config (%USERPROFILE%\\.telemetry-tracker\\config.env).
 
-Displays a small Tkinter window asking for the employee's User ID.
-The backend URL is pre-configured by the admin at build time.
-Writes config to %USERPROFILE%\\.telemetry-tracker\\config.env
+The MSI launcher (launcher.py) creates config automatically on first run using the
+Windows username and baked BACKEND_URL — it calls write_config() directly without UI.
+
+show_setup() remains available for manual runs: python -m installer.windows.setup_gui
 """
 
 from __future__ import annotations

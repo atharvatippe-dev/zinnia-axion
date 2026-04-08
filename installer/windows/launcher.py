@@ -1,16 +1,16 @@
 """
-Launcher - entry point for the bundled Zinnia Axion .exe (Windows).
+Launcher — entry point for the frozen Zinnia Axion Windows executable (cx_Freeze MSI).
 
-Flow (Fully Automatic - No User Prompts):
-  1. Check if %USERPROFILE%\\.telemetry-tracker\\config.env exists
-  2. If not → auto-detect LAN ID from Windows USERNAME (first launch)
-  3. Create config.env automatically with detected LAN ID
-  4. Load config.env into environment
-  5. Install Task Scheduler auto-start entry (idempotent)
-  6. Start the Zinnia Axion Agent
+Flow (first run is automatic, no GUI):
+  1. If %USERPROFILE%\\.telemetry-tracker\\config.env is missing or empty, create it
+     using the Windows login name as USER_ID and BACKEND_URL from the baked
+     installer.windows.build_config (written at MSI build time from INSTALLER_BACKEND_URL).
+  2. Load config.env into os.environ (tracker.agent reads BACKEND_URL, USER_ID, etc.).
+  3. Install Task Scheduler auto-start (idempotent) pointing at this same executable.
+  4. Start tracker.agent.
 
-The tracker automatically uses the employee's Windows login username (LAN ID)
-without requiring any user input. Perfect for silent enterprise deployment.
+Bundled `tracker/` and `installer/windows/` live next to the exe (cx_Freeze) or under
+sys._MEIPASS (PyInstaller onefile). BUNDLE_DIR must match that layout so imports work.
 """
 
 from __future__ import annotations
@@ -34,10 +34,11 @@ logging.basicConfig(
 )
 logger = logging.getLogger("tracker.launcher")
 
-# When bundled with PyInstaller, files are in a temp dir.
-# _MEIPASS is set by PyInstaller; fall back to script dir for dev.
+# Frozen layout: cx_Freeze places lib + bundled folders beside the exe; PyInstaller
+# onefile extracts to sys._MEIPASS. Use _MEIPASS when present so imports match build.py.
 if getattr(sys, "frozen", False):
-    BUNDLE_DIR = Path(sys._MEIPASS)
+    meipass = getattr(sys, "_MEIPASS", None)
+    BUNDLE_DIR = Path(meipass) if meipass else Path(sys.executable).parent
 else:
     BUNDLE_DIR = Path(__file__).resolve().parent.parent.parent
 

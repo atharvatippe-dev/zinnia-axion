@@ -31,6 +31,7 @@ jobs:
           pip install -r requirements.txt
           pip install pywin32 psutil pynput
       
+      # MSI logic lives only in installer/windows/build_msi.py; setup_msi.py is a root wrapper.
       - name: Build MSI
         env:
           INSTALLER_BACKEND_URL: ${{ github.event.inputs.backend_url || 'https://axion.company.com' }}
